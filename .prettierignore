@@ -35,3 +35,8 @@ pnpm-lock.yaml
 package-lock.json
 yarn.lock
 server
+
+# Generated
+/drizzle/meta
+/src-tauri/gen
+/src-tauri/target

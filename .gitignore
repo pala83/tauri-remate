@@ -44,3 +44,5 @@ lerna-debug.log*
 
 .nx/cache
 .nx/workspace-data
+# Symlink to the local app data dir (~/.config/com.palazzo.remates)
+/com.palazzo.remates

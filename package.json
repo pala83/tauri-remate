@@ -11,6 +11,7 @@
     "build": "qwik build",
     "build.client": "vite build",
     "build.preview": "vite build --ssr src/entry.preview.tsx",
+    "build.server": "qwik check-client src dist && vite build -c adapters/static/vite.config.ts",
     "build.types": "tsc --incremental --noEmit",
     "deploy": "echo 'Run \"npm run qwik add\" to install a server adapter'",
     "dev": "vite --mode ssr",
@@ -20,7 +21,9 @@
     "lint": "eslint \"src/**/*.ts*\"",
     "preview": "qwik build preview && vite preview --open",
     "start": "vite --open --mode ssr",
-    "qwik": "qwik"
+    "qwik": "qwik",
+    "db.generate": "drizzle-kit generate",
+    "db.studio": "drizzle-kit studio"
   },
   "devDependencies": {
     "@builder.io/qwik": "^1.20.3",
@@ -32,8 +35,11 @@
     "@qwikest/icons": "^0.0.13",
     "@tailwindcss/vite": "^4.1.4",
     "@tauri-apps/cli": "^2.12.4",
+    "@tauri-apps/plugin-sql": "^2.6.0",
     "@types/node": "20.19.0",
     "class-variance-authority": "0.7.1",
+    "drizzle-kit": "^0.31.11",
+    "drizzle-orm": "^0.45.4",
     "eslint": "9.32.0",
     "eslint-plugin-qwik": "^1.20.3",
     "globals": "16.4.0",
