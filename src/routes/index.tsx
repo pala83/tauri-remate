@@ -1,101 +1,60 @@
-import { $, component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
-import { desc } from "drizzle-orm";
-import { Button, Card, Input, Label } from "~/components/ui";
-import { getDb } from "~/db/client";
-import { remates, type Remate } from "~/db/schema";
+import { remateActivo, useAppState } from "~/components/app-state/app-state";
+import { FormMessage } from "~/components/page-columns/form-message";
+import { PageColumns } from "~/components/page-columns/page-columns";
+import { PageIntro } from "~/components/page-columns/page-intro";
+import { PageToc } from "~/components/page-columns/page-toc";
+import { SectionHeading } from "~/components/page-columns/section-heading";
+import { RemateActivo } from "~/components/remate-activo/remate-activo";
+import { RemateForm } from "~/components/remate-form/remate-form";
+import { RematesNav } from "~/components/remates-nav/remates-nav";
+import { RematesTable } from "~/components/remates-table/remates-table";
+import { Skeleton } from "~/components/ui";
+
+const SECCIONES = [
+  { id: "remate-activo", label: "Remate activo" },
+  { id: "todos-los-remates", label: "Todos los remates" },
+  { id: "nuevo-remate", label: "Nuevo remate" },
+];
 
 export default component$(() => {
-  const items = useSignal<Remate[]>([]);
-  const error = useSignal<string>();
-  const titulo = useSignal("");
-  const fecha = useSignal("");
-
-  const load = $(async () => {
-    try {
-      const db = await getDb();
-      items.value = await db
-        .select()
-        .from(remates)
-        .orderBy(desc(remates.createdAt), desc(remates.id));
-      error.value = undefined;
-    } catch (err) {
-      error.value = String(err);
-    }
-  });
-
-  // The database only exists inside the Tauri webview, so load on the client.
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(() => load());
-
-  const create = $(async () => {
-    if (!titulo.value.trim() || !fecha.value) return;
-    try {
-      const db = await getDb();
-      await db.insert(remates).values({
-        titulo: titulo.value.trim(),
-        fecha: new Date(`${fecha.value}T00:00:00`),
-      });
-      titulo.value = "";
-      fecha.value = "";
-      await load();
-    } catch (err) {
-      error.value = String(err);
-    }
-  });
+  const { state } = useAppState();
+  const activa = remateActivo(state);
 
   return (
-    <div class="mx-auto flex w-full max-w-2xl flex-col gap-6 p-6">
-      <h1 class="text-2xl font-bold">Remates</h1>
+    <PageColumns>
+      <RematesNav q:slot="nav" />
+      <PageToc q:slot="toc" items={SECCIONES} />
+      <PageIntro
+        eyebrow="Apartado · remates"
+        title="Remates"
+        text="Elegí el remate con la que vas a trabajar. Cada remate tiene sus propios lotes, numerados desde el 1; los clientes son los mismos para todas."
+      />
+      {state.error && (
+        <div class="mt-6">
+          <FormMessage mensaje={{ tipo: "error", texto: state.error }} />
+        </div>
+      )}
 
-      <Card.Root>
-        <Card.Header>
-          <Card.Title>Nuevo remate</Card.Title>
-        </Card.Header>
-        <Card.Content>
-          <form
-            preventdefault:submit
-            onSubmit$={create}
-            class="flex flex-col gap-4"
-          >
-            <div class="flex flex-col gap-2">
-              <Label for="titulo">Título</Label>
-              <Input id="titulo" name="titulo" required bind:value={titulo} />
-            </div>
-            <div class="flex flex-col gap-2">
-              <Label for="fecha">Fecha</Label>
-              <Input
-                id="fecha"
-                name="fecha"
-                type="date"
-                required
-                bind:value={fecha}
-              />
-            </div>
-            <Button type="submit">Guardar</Button>
-          </form>
-        </Card.Content>
-      </Card.Root>
+      <SectionHeading id="remate-activo" title="Remate activo" />
+      {!state.cargado && <Skeleton class="h-48" />}
+      {activa && <RemateActivo remate={activa} />}
+      {state.cargado && !activa && (
+        <p class="text-muted-foreground text-lg italic">
+          Creá un remate para empezar a cargar lotes.
+        </p>
+      )}
 
-      {error.value && <p class="text-alert text-sm">{error.value}</p>}
+      <SectionHeading id="todos-los-remates" title="Todos los remates" />
+      <RematesTable />
 
-      <ul class="flex flex-col gap-2">
-        {items.value.map((r) => (
-          <li key={r.id} class="border-base flex justify-between p-3">
-            <span>{r.titulo}</span>
-            <span class="text-muted-foreground">
-              {r.fecha.toLocaleDateString()}
-            </span>
-          </li>
-        ))}
-        {items.value.length === 0 && !error.value && (
-          <li class="text-muted-foreground">Todavía no hay remates.</li>
-        )}
-      </ul>
-    </div>
+      <SectionHeading id="nuevo-remate" title="Nuevo remate" />
+      <RemateForm />
+    </PageColumns>
   );
 });
 
 export const head: DocumentHead = {
-  title: "Remates",
+  title: "Remates · Libro de Remates",
 };

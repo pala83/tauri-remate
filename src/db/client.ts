@@ -6,12 +6,6 @@ export type Db = SqliteRemoteDatabase<typeof schema>;
 
 let dbPromise: Promise<Db> | undefined;
 
-/**
- * Lazily opens the SQLite database through tauri-plugin-sql, applies pending
- * migrations and returns a Drizzle instance. Only works inside the Tauri
- * webview: call it from client-side code (`useVisibleTask$`, event handlers),
- * never during SSR/prerender, and don't store the result in Qwik state.
- */
 export function getDb(): Promise<Db> {
   dbPromise ??= open().catch((err) => {
     dbPromise = undefined;
@@ -31,9 +25,6 @@ async function open(): Promise<Db> {
         await sqlite.execute(sql, params);
         return { rows: [] };
       }
-      // The plugin returns rows as objects; Drizzle expects arrays in column
-      // order. Columns with the same name (e.g. two `id`s in a join) collapse,
-      // so alias them explicitly in `select({...})`.
       const rows = (
         await sqlite.select<Record<string, unknown>[]>(sql, params)
       ).map((row) => Object.values(row));

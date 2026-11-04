@@ -13,14 +13,21 @@
     "windows": [
       {
         "title": "remates-palazzo",
-        "width": 800,
-        "height": 600,
+        "width": 1280,
+        "height": 800,
+        "maximized": true,
         "resizable": true,
         "fullscreen": false
       }
     ],
     "security": {
-      "csp": null
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "$APPCONFIG/imagenes/**"
+        ]
+      }
     }
   },
   "bundle": {

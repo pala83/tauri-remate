@@ -8,6 +8,41 @@
       "when": 1793439605470,
       "tag": "0000_plain_riptide",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1793645543850,
+      "tag": "0001_bent_shockwave",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1793684759861,
+      "tag": "0002_handy_inertia",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1793744170928,
+      "tag": "0003_clientes_minusculas",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1793757468268,
+      "tag": "0004_lotes_vendido_con",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1793816293475,
+      "tag": "0005_liquidaciones",
+      "breakpoints": true
     }
   ]
 }

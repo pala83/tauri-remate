@@ -1,0 +1,286 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "fa7b0c59-5897-4a87-875f-f14d5334a184",
+  "prevId": "71569296-0fb4-43de-90c6-63dd5028b4ce",
+  "tables": {
+    "clientes": {
+      "name": "clientes",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "referido": {
+          "name": "referido",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "telefono": {
+          "name": "telefono",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "lotes": {
+      "name": "lotes",
+      "columns": {
+        "remate_id": {
+          "name": "remate_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "numero": {
+          "name": "numero",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "dueno_id": {
+          "name": "dueno_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "comprador_id": {
+          "name": "comprador_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cantidad": {
+          "name": "cantidad",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "materiales": {
+          "name": "materiales",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "marca": {
+          "name": "marca",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "funciona": {
+          "name": "funciona",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "es_nuevo": {
+          "name": "es_nuevo",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "precio_base": {
+          "name": "precio_base",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "imagen": {
+          "name": "imagen",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "precio_venta": {
+          "name": "precio_venta",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "pagado": {
+          "name": "pagado",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        }
+      },
+      "indexes": {
+        "lotes_dueno_idx": {
+          "name": "lotes_dueno_idx",
+          "columns": [
+            "dueno_id"
+          ],
+          "isUnique": false
+        },
+        "lotes_comprador_idx": {
+          "name": "lotes_comprador_idx",
+          "columns": [
+            "comprador_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "lotes_remate_id_remates_id_fk": {
+          "name": "lotes_remate_id_remates_id_fk",
+          "tableFrom": "lotes",
+          "tableTo": "remates",
+          "columnsFrom": [
+            "remate_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "lotes_dueno_id_clientes_id_fk": {
+          "name": "lotes_dueno_id_clientes_id_fk",
+          "tableFrom": "lotes",
+          "tableTo": "clientes",
+          "columnsFrom": [
+            "dueno_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "lotes_comprador_id_clientes_id_fk": {
+          "name": "lotes_comprador_id_clientes_id_fk",
+          "tableFrom": "lotes",
+          "tableTo": "clientes",
+          "columnsFrom": [
+            "comprador_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "lotes_remate_id_numero_pk": {
+          "columns": [
+            "remate_id",
+            "numero"
+          ],
+          "name": "lotes_remate_id_numero_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "lotes_numero_check": {
+          "name": "lotes_numero_check",
+          "value": "\"lotes\".\"numero\" >= 1"
+        },
+        "lotes_venta_check": {
+          "name": "lotes_venta_check",
+          "value": "(\"lotes\".\"comprador_id\" IS NULL) = (\"lotes\".\"precio_venta\" IS NULL)"
+        },
+        "lotes_pagado_check": {
+          "name": "lotes_pagado_check",
+          "value": "\"lotes\".\"pagado\" = 0 OR \"lotes\".\"precio_venta\" IS NOT NULL"
+        }
+      }
+    },
+    "remates": {
+      "name": "remates",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fecha": {
+          "name": "fecha",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "lugar": {
+          "name": "lugar",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

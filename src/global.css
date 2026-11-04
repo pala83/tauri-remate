@@ -1,117 +1,124 @@
-@layer base, qwik-ui, popover-polyfill, theme, components, utilities;
+@layer theme, base, qwik-ui, popover-polyfill, components, utilities;
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "@fontsource/im-fell-english/400.css";
+@import "@fontsource/im-fell-english/400-italic.css";
+@import "@fontsource/courier-prime/400.css";
+@import "@fontsource/courier-prime/400-italic.css";
+@import "@fontsource/courier-prime/700.css";
+@import "@fontsource-variable/eb-garamond/index.css";
+@import "@fontsource-variable/eb-garamond/wght-italic.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @layer base {
+  /*
+   * "Libro de Remates" palette: aged paper and ink. The design has eight colors
+   * with no token of their own, so they take the palette of the sidebar, which
+   * no longer exists:
+   *   --sidebar-primary             accent (labels, required marks, next N°)
+   *   --sidebar-primary-foreground  accent on the dark panel
+   *   --sidebar-accent              blue stamp
+   *   --sidebar-accent-foreground   faint text on the dark panel
+   *   --sidebar-border              ruled lines
+   *   --sidebar                     paper's light (`textura`)
+   *   --sidebar-foreground          paper's stains (`textura`)
+   *   --sidebar-ring                paper's fibers (`hoja`)
+   * --popover is the fields' background, --secondary the dark panel, and
+   * --shadow-inner the shadow of a focused field. --shadow-2xl is 6px, smaller
+   * than --shadow-lg: it's the design's value for the lots sheet and quick entry.
+   */
   :root {
-    --background: white;
-    --foreground: var(--color-slate-950);
-    --muted: var(--color-slate-100);
-    --muted-foreground: var(--color-slate-700);
-    --popover: white;
-    --popover-foreground: var(--color-slate-900);
-    --card: white;
-    --card-foreground: var(--color-slate-900);
-    --border: black;
-    --input: black;
-    --primary: var(--color-cyan-600);
-    --primary-foreground: white;
-    --secondary: var(--color-slate-900);
-    --secondary-foreground: white;
-    --accent: var(--color-slate-100);
-    --accent-foreground: var(--color-slate-900);
-    --alert: var(--color-red-500);
-    --alert-foreground: var(--color-slate-50);
-    --ring: black;
+    --background: #ecdfc2;
+    --foreground: #2a1c12;
+    --muted: #e2d1ae;
+    --muted-foreground: #6a5039;
+    --popover: #fbf5e6;
+    --popover-foreground: #2a1c12;
+    --card: #f5ebd3;
+    --card-foreground: #2a1c12;
+    --border: #2a1c12;
+    --input: #2a1c12;
+    --primary: #6e3f1e;
+    --primary-foreground: #f5ebd3;
+    --secondary: #2a1c12;
+    --secondary-foreground: #eadbb8;
+    --accent: #e8d2a2;
+    --accent-foreground: #2a1c12;
+    --alert: #94371a;
+    --alert-foreground: #f5ebd3;
+    --ring: #2c4777;
+    --sidebar: rgba(255, 249, 232, 0.65);
+    --sidebar-foreground: rgba(139, 90, 43, 0.13);
+    --sidebar-primary: #8b4a1c;
+    --sidebar-primary-foreground: #e0a867;
+    --sidebar-accent: #2c4777;
+    --sidebar-accent-foreground: #bca582;
+    --sidebar-border: #cbb48a;
+    --sidebar-ring: rgba(110, 63, 30, 0.04);
     --border-width: 2px;
     --stroke-width: 2px;
-    --border-radius: 0rem;
-    --shadow-base: 0px 1px rgba(0, 0, 0, 1);
-    --shadow-2xs: 1px 2px rgba(0, 0, 0, 1);
-    --shadow-xs: 3px 4px rgba(0, 0, 0, 1);
-    --shadow-sm: 5px 6px rgba(0, 0, 0, 1);
-    --shadow-md: 7px 8px rgba(0, 0, 0, 1);
-    --shadow-lg: 9px 10px rgba(0, 0, 0, 1);
-    --shadow-xl: 11px 12px rgba(0, 0, 0, 1);
-    --shadow-2xl: 13px 14px rgba(0, 0, 0, 1);
-    --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.01);
-    --transform-press: translate(4px, 4px);
+    --border-radius: 0.125rem;
+    --shadow-base: 0 0 0 #2a1c12;
+    --shadow-2xs: 2px 2px 0 #2a1c12;
+    --shadow-xs: 3px 3px 0 #2a1c12;
+    --shadow-sm: 4px 4px 0 #2a1c12;
+    --shadow-md: 5px 5px 0 #2a1c12;
+    --shadow-lg: 8px 8px 0 #2a1c12;
+    --shadow-xl: 10px 10px 0 #2a1c12;
+    --shadow-2xl: 6px 6px 0 #2a1c12;
+    --shadow-inner: 4px 4px 0 var(--sidebar-primary);
+    --transform-press: translate(3px, 3px);
   }
   .dark {
-    --background: var(--color-slate-950);
-    --foreground: var(--color-slate-50);
-    --muted: var(--color-slate-800);
-    --muted-foreground: var(--color-slate-300);
-    --popover: var(--color-slate-950);
-    --popover-foreground: var(--color-slate-50);
-    --card: var(--color-slate-950);
-    --card-foreground: var(--color-slate-50);
-    --border: black;
-    --input: black;
-    --primary: var(--color-cyan-600);
-    --primary-foreground: white;
-    --secondary: var(--color-slate-100);
-    --secondary-foreground: black;
-    --accent: var(--color-slate-700);
-    --accent-foreground: var(--color-slate-50);
-    --alert: var(--color-red-500);
-    --alert-foreground: var(--color-slate-50);
-    --ring: black;
-    --border-width: 3px;
+    --background: #21160f;
+    --foreground: #ecdfc2;
+    --muted: #362619;
+    --muted-foreground: #bfa785;
+    --popover: #1a110b;
+    --popover-foreground: #ecdfc2;
+    --card: #2a1d14;
+    --card-foreground: #ecdfc2;
+    --border: #8c7152;
+    --input: #8c7152;
+    --primary: #e0a867;
+    --primary-foreground: #21160f;
+    --secondary: #120c08;
+    --secondary-foreground: #eadbb8;
+    --accent: #44301e;
+    --accent-foreground: #ecdfc2;
+    --alert: #f0905f;
+    --alert-foreground: #21160f;
+    --ring: #e0a867;
+    --sidebar: rgba(224, 168, 103, 0.07);
+    --sidebar-foreground: rgba(0, 0, 0, 0.3);
+    --sidebar-primary: #e0a867;
+    --sidebar-primary-foreground: #e0a867;
+    --sidebar-accent: #9fb6e3;
+    --sidebar-accent-foreground: #a8916f;
+    --sidebar-border: #4a3624;
+    --sidebar-ring: rgba(236, 223, 194, 0.025);
+    --border-width: 2px;
     --stroke-width: 2px;
-    --border-radius: 0rem;
-    --shadow-base: 0px 1px rgba(0, 0, 0, 1);
-    --shadow-2xs: 0px 1px rgba(0, 0, 0, 1);
-    --shadow-xs: 1px 2px rgba(0, 0, 0, 1);
-    --shadow-sm: 3px 4px rgba(0, 0, 0, 1);
-    --shadow-md: 5px 6px rgba(0, 0, 0, 1);
-    --shadow-lg: 7px 8px rgba(0, 0, 0, 1);
-    --shadow-xl: 9px 10px rgba(0, 0, 0, 1);
-    --shadow-2xl: 11px 12px rgba(0, 0, 0, 1);
-    --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.01);
-    --transform-press: translate(4px, 4px);
-  }
-
-  /* Sidebar colors: declared on both so they resolve against each theme. */
-  :root,
-  .dark {
-    --sidebar: var(--card);
-    --sidebar-foreground: var(--card-foreground);
-    --sidebar-primary: var(--primary);
-    --sidebar-primary-foreground: var(--primary-foreground);
-    --sidebar-accent: var(--accent);
-    --sidebar-accent-foreground: var(--accent-foreground);
-    --sidebar-border: var(--border);
-    --sidebar-ring: var(--ring);
-  }
-
-  /* Sidebar dimensions */
-  :root {
-    --sidebar-width: 16rem;
-    --sidebar-width-mobile: 18rem;
-    --sidebar-mobile-breakpoint: 48rem;
-    --sidebar-padding: 0.5rem;
-    --sidebar-gap: 0.25rem;
-    --sidebar-item-height-sm: 2rem;
-    --sidebar-item-height-md: 2.5rem;
-    --sidebar-item-height-lg: 3rem;
-    --sidebar-icon-size: 1rem;
-    --sidebar-sub-indent: 0.875rem;
-    --sidebar-duration: 200ms;
-    --sidebar-width-icon: calc(
-      var(--sidebar-item-height-md) + 2 * var(--sidebar-padding) +
-        var(--default-border-width)
-    );
-    --sidebar-width-icon-floating: calc(
-      var(--sidebar-width-icon) + 2 * var(--sidebar-padding) +
-        var(--default-border-width)
-    );
+    --border-radius: 0.125rem;
+    --shadow-base: 0 0 0 #0b0704;
+    --shadow-2xs: 2px 2px 0 #0b0704;
+    --shadow-xs: 3px 3px 0 #0b0704;
+    --shadow-sm: 4px 4px 0 #0b0704;
+    --shadow-md: 5px 5px 0 #0b0704;
+    --shadow-lg: 8px 8px 0 #0b0704;
+    --shadow-xl: 10px 10px 0 #0b0704;
+    --shadow-2xl: 6px 6px 0 #0b0704;
+    --shadow-inner: 4px 4px 0 var(--sidebar-primary);
+    --transform-press: translate(3px, 3px);
   }
 }
 
 @theme {
+  --font-sans: "EB Garamond Variable", Garamond, "Times New Roman", serif;
+  --font-serif: "IM Fell English", "Iowan Old Style", Georgia, serif;
+  --font-mono: "Courier Prime", "Courier New", Courier, monospace;
+  --text-base: 1.0625rem;
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -155,7 +162,7 @@
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
   --shadow-inner: var(--shadow-inner);
-  --default-border-width: calc(var(--border-width) + 1px);
+  --default-border-width: var(--border-width);
   --border-width-base: var(--border-width);
   --border-width-2: calc(var(--border-width) + 2px);
   --border-width-4: calc(var(--border-width) + 4px);
@@ -188,6 +195,45 @@
 @utility press {
   transform: var(--transform-press);
 }
+/* Aged paper: a vignette on the work area and laid-paper fibers on the sheets. */
+@utility textura {
+  background-image:
+    radial-gradient(120% 60% at 50% -10%, var(--sidebar), transparent 65%),
+    radial-gradient(
+      40% 35% at 102% 100%,
+      var(--sidebar-foreground),
+      transparent 70%
+    ),
+    radial-gradient(
+      30% 28% at -2% 60%,
+      var(--sidebar-foreground),
+      transparent 70%
+    );
+}
+@utility hoja {
+  background-image: repeating-linear-gradient(
+    0deg,
+    var(--sidebar-ring) 0 1px,
+    transparent 1px 5px
+  );
+}
+/* A lot that was just entered: the row fades like fresh ink. */
+@keyframes tinta-fresca {
+  from {
+    background-color: var(--accent);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+@utility tinta-fresca {
+  animation: tinta-fresca 2s ease-out;
+}
+@utility scroll-fino {
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted-foreground) transparent;
+}
 @utility border-width-* {
   /* prettier-ignore */
   border: --value(--border-width-*);
@@ -206,6 +252,6 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground text-base;
   }
 }

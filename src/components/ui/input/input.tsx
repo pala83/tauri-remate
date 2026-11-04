@@ -3,6 +3,8 @@ import { cn } from "@qwik-ui/utils";
 
 type InputProps = PropsOf<"input"> & {
   error?: string;
+  /** The id of a <datalist> with suggestions. */
+  list?: string;
 };
 
 export const Input = component$<InputProps>(
@@ -22,7 +24,7 @@ export const Input = component$<InputProps>(
             onInput$,
           ]}
           class={cn(
-            "rounded-base border-input bg-background text-foreground file:text-foreground placeholder:text-muted-foreground focus-visible:ring-ring flex h-12 w-full border px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-1 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
+            "border-input bg-popover text-foreground file:text-foreground placeholder:text-muted-foreground flex h-11.5 w-full rounded-sm border px-3 py-1 text-lg transition-shadow duration-100 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:italic focus:shadow-inner focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
             props.class,
           )}
           id={inputId}

@@ -3,5 +3,46 @@
   "identifier": "default",
   "description": "enables the default permissions",
   "windows": ["main"],
-  "permissions": ["core:default", "sql:default", "sql:allow-execute"]
+  "permissions": [
+    "core:default",
+    "sql:default",
+    "sql:allow-execute",
+    "dialog:allow-open",
+    "fs:allow-mkdir",
+    "fs:allow-copy-file",
+    {
+      "identifier": "fs:scope",
+      "allow": [
+        {
+          "path": "$APPCONFIG/imagenes"
+        },
+        {
+          "path": "$APPCONFIG/imagenes/**"
+        }
+      ]
+    },
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        {
+          "url": "https://www.google.com/maps*"
+        },
+        {
+          "url": "https://www.google.com.ar/maps*"
+        },
+        {
+          "url": "https://maps.google.com/*"
+        },
+        {
+          "url": "https://maps.google.com.ar/*"
+        },
+        {
+          "url": "https://maps.app.goo.gl/*"
+        },
+        {
+          "url": "https://goo.gl/maps*"
+        }
+      ]
+    }
+  ]
 }
