@@ -10,7 +10,7 @@ import { SeleccionRapida } from "./seleccion-rapida";
 import { useCargaRapida } from "./use-carga-rapida";
 
 const evitarEnAtajo = sync$((e: KeyboardEvent) => {
-  if (e.altKey && /^Digit[1-5]$/.test(e.code)) e.preventDefault();
+  if (e.ctrlKey && /^Digit[1-5]$/.test(e.code)) e.preventDefault();
 });
 
 export const CargaRapida = component$<{ page: LotesPageState }>(({ page }) => {

@@ -29,7 +29,7 @@ export default component$(() => {
       <PageIntro
         eyebrow="Apartado · remates"
         title="Remates"
-        text="Elegí el remate con la que vas a trabajar. Cada remate tiene sus propios lotes, numerados desde el 1; los clientes son los mismos para todas."
+        text="Elegí el remate con la que vas a trabajar. Podés crear un remate nuevo, editar uno existente o eliminarlo."
       />
       {state.error && (
         <div class="mt-6">
@@ -56,5 +56,5 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: "Remates · Libro de Remates",
+  title: "Remates · Creacion y edición de remates",
 };

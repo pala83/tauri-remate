@@ -22,7 +22,7 @@ export const PageToc = component$<TocProps>(({ items }) => {
                 if (item.foco) document.getElementById(item.foco)?.focus();
               }}
               class={cn(
-                "text-muted-foreground hover:text-foreground aria-[current=true]:text-foreground block py-1 hover:underline aria-[current=true]:font-bold",
+                "text-muted-foreground hover:text-foreground aria-current:text-foreground block py-1 hover:underline aria-current:font-bold",
                 item.sub && "pl-4.5",
               )}
             >

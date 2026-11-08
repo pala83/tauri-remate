@@ -4,9 +4,9 @@ import { Link, useLocation } from "@builder.io/qwik-city";
 import { buttonVariants } from "~/components/ui";
 
 const TABS = [
-  { href: "/", label: "Remates" },
   { href: "/lotes/", label: "Lotes" },
   { href: "/clientes/", label: "Clientes" },
+  { href: "/martillo/", label: "Remate" },
 ];
 
 export const AppTabs = component$(() => {

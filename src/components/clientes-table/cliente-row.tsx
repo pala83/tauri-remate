@@ -4,16 +4,27 @@ import { RolBadges } from "~/components/rol-badges/rol-badges";
 import { Button } from "~/components/ui";
 import type { ClienteResumen } from "~/db/clientes";
 import { irA } from "~/lib/scroll";
-import { lotesTxt, titulo } from "~/lib/textos";
+import { pesos, titulo } from "~/lib/textos";
+import { claseSaldo, saldoCorto } from "~/components/liquidacion/saldo";
+
+export type SaldoCliente = {
+  tCompras: number;
+  tVentas: number;
+  saldo: number;
+  hayMovimientos: boolean;
+};
+
+const monto = (n?: number) => (n ? pesos(n) : "—");
 
 type ClienteRowProps = {
   cliente: ClienteResumen;
   selected: boolean;
+  saldo?: SaldoCliente;
   onElegir$: QRL<(id: number) => void>;
 };
 
 export const ClienteRow = component$<ClienteRowProps>(
-  ({ cliente, selected, onElegir$ }) => {
+  ({ cliente, selected, saldo, onElegir$ }) => {
     return (
       <DataRow selected={selected}>
         <td>
@@ -31,11 +42,12 @@ export const ClienteRow = component$<ClienteRowProps>(
         <td>
           <RolBadges aporta={cliente.aporta} compro={cliente.compro} />
         </td>
-        <td class="font-mono text-sm">
-          {cliente.aporta ? lotesTxt(cliente.aporta) : "—"}
-        </td>
-        <td class="font-mono text-sm">
-          {cliente.compro ? lotesTxt(cliente.compro) : "—"}
+        <td class="font-mono text-sm">{monto(saldo?.tCompras)}</td>
+        <td class="font-mono text-sm">{monto(saldo?.tVentas)}</td>
+        <td
+          class={`font-mono text-sm font-bold ${claseSaldo(saldo?.saldo ?? 0)}`}
+        >
+          {saldoCorto(saldo?.saldo ?? 0, saldo?.hayMovimientos ?? false)}
         </td>
       </DataRow>
     );

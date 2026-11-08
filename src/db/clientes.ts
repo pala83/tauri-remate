@@ -52,6 +52,11 @@ export async function editarCliente(id: number, valores: NewCliente) {
     .where(eq(clientes.id, id));
 }
 
+export async function marcarSinComision(id: number, sinComision: boolean) {
+  const db = await getDb();
+  await db.update(clientes).set({ sinComision }).where(eq(clientes.id, id));
+}
+
 const loteConRemate = {
   ...getTableColumns(lotes),
   // Both tables have a `nombre` column and the plugin keys rows by column name,

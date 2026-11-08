@@ -1,4 +1,11 @@
-import { $, useSignal, useStore, useVisibleTask$ } from "@builder.io/qwik";
+import {
+  $,
+  useComputed$,
+  useSignal,
+  useStore,
+  useVisibleTask$,
+} from "@builder.io/qwik";
+import { remateActivo, useAppState } from "~/components/app-state/app-state";
 import { clienteVacio } from "~/components/cliente-form/cliente-form-state";
 import type { FiltroClientes } from "~/components/clientes-table/clientes-filtro";
 import {
@@ -7,10 +14,11 @@ import {
   type ClienteResumen,
   type Historial,
 } from "~/db/clientes";
-import { irA } from "~/lib/scroll";
-import { errorTxt, titulo } from "~/lib/textos";
+import { useSaldos } from "./use-saldos";
+import { errorTxt } from "~/lib/textos";
 
 export const useClientesPage = () => {
+  const { state } = useAppState();
   const clientes = useSignal<ClienteResumen[]>([]);
   const seleccionado = useSignal<number | null>(null);
   const historial = useSignal<Historial>();
@@ -18,6 +26,11 @@ export const useClientesPage = () => {
   const error = useSignal<string>();
   const cargado = useSignal(false);
   const form = useStore(clienteVacio());
+  const activa = useComputed$(() => remateActivo(state));
+  const actual = useComputed$(() =>
+    clientes.value.find((c) => c.id === seleccionado.value),
+  );
+  const { saldos, deuda, leerSaldos } = useSaldos(clientes);
 
   const elegir = $(async (id: number) => {
     seleccionado.value = id;
@@ -44,24 +57,25 @@ export const useClientesPage = () => {
     Object.assign(form, clienteVacio());
   });
 
-  const editar = $((cliente: ClienteResumen) => {
-    Object.assign(form, {
-      id: cliente.id,
-      nombre: titulo(cliente.nombre),
-      telefono: cliente.telefono ?? "",
-      email: cliente.email ?? "",
-      referido: titulo(cliente.referido ?? ""),
-    });
-    irA("nuevo-cliente", "cliente-nombre");
-  });
-
   // The database only exists inside the Tauri webview, so load on the client.
   // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(() => cargar());
+  useVisibleTask$(async ({ track }) => {
+    track(() => state.activoId);
+    try {
+      await Promise.all([cargar(), leerSaldos()]);
+    } catch (err) {
+      error.value = errorTxt(err);
+    }
+  });
 
   return {
     cargado,
     clientes,
+    activa,
+    actual,
+    saldos,
+    deuda,
+    leerSaldos,
     seleccionado,
     historial,
     filtro,
@@ -70,6 +84,7 @@ export const useClientesPage = () => {
     elegir,
     cargar,
     nuevo,
-    editar,
   };
 };
+
+export type ClientesPageState = ReturnType<typeof useClientesPage>;

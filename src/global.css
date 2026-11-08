@@ -28,7 +28,8 @@
    * --shadow-inner the shadow of a focused field. --shadow-2xl is 6px, smaller
    * than --shadow-lg: it's the design's value for the lots sheet and quick entry.
    */
-  :root {
+  :root,
+  .papel-claro {
     --background: #ecdfc2;
     --foreground: #2a1c12;
     --muted: #e2d1ae;
@@ -253,5 +254,33 @@
   }
   body {
     @apply bg-background text-foreground text-base;
+  }
+}
+
+/* A printed page is the copy `src/lib/imprimir.ts` leaves in `body`, and nothing else. */
+.zona-impresion {
+  display: none;
+}
+
+@page {
+  size: A4;
+  margin: 14mm;
+}
+
+@media print {
+  html,
+  body {
+    height: auto;
+    overflow: visible;
+    background: none;
+  }
+
+  body > :not(.zona-impresion) {
+    display: none;
+  }
+
+  .zona-impresion {
+    display: block;
+    color: var(--foreground);
   }
 }

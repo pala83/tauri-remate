@@ -18,6 +18,13 @@ export const useLoteForm = (page: LotesPageState, numero: number) => {
   const guardar = $(async (seguir: boolean) => {
     const remateId = page.remateCargado.value;
     error.value = errorDeLote(form);
+    const vinculados = page.lotes.value.filter((l) => l.vendidoCon === numero);
+    if (
+      !error.value &&
+      vinculados.length &&
+      !(form.precioVenta && form.compradorId)
+    )
+      error.value = `Se vendió junto con el N° ${vinculados.map((l) => l.numero).join(", ")}: separalos antes de quitarle la venta.`;
     if (error.value || remateId === null) return;
     try {
       await editarLote(remateId, numero, aValores(form));

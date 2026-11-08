@@ -14,6 +14,8 @@ export type DuenoBuscadorProps = {
   duenoId: number | null;
   /** Floats the list above the field; otherwise a scrolling panel clips it. */
   arriba?: boolean;
+  /** Floats the list below the field, over what comes after it. */
+  abajo?: boolean;
   onElegir$: QRL<(id: number, conEnter: boolean) => void>;
   onNuevo$: QRL<(nombre: string) => Promise<number>>;
   onEnter$?: QRL<() => void>; // Enter with the list closed
@@ -67,7 +69,9 @@ export const DuenoBuscador = component$<DuenoBuscadorProps>((props) => {
             "bg-card rounded-sm border p-1.5 shadow-xs",
             props.arriba
               ? "absolute inset-x-0 bottom-full z-30 mb-2 max-h-96 overflow-y-auto shadow-2xl"
-              : "mt-2",
+              : props.abajo
+                ? "absolute inset-x-0 top-full z-30 mt-2 max-h-96 overflow-y-auto shadow-2xl"
+                : "mt-2",
           )}
         >
           {lista.map((opcion, i) => (

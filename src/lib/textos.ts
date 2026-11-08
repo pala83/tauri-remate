@@ -1,8 +1,28 @@
 /** "13" -> "013", as lot numbers read on a catalog. */
 export const numeroLote = (n: number) => String(n).padStart(3, "0");
 
-/** 150000 -> "$150.000". */
-export const pesos = (n: number) => `$${n.toLocaleString("es-AR")}`;
+/** 150000 -> "$ 150.000". The sign is left to the text around it. */
+export const pesos = (n: number) =>
+  `$ ${String(Math.round(Math.abs(n))).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
+
+/** What a typed amount is worth: "$ 1.500" -> 1500; nothing typed -> 0. */
+export const aPesos = (texto: string) =>
+  Number(texto.split(",")[0].replace(/\D/g, ""));
+
+/** 1000 -> "10%", 250 -> "2,5%": a commission as it's stored, in hundredths. */
+export const porcentaje = (comision: number) => `${campoComision(comision)}%`;
+
+/** 1000 -> "10", 250 -> "2,5": a stored commission, as it's typed. */
+export const campoComision = (comision: number) =>
+  String(comision / 100).replace(".", ",");
+
+/** "2,5" -> 250. Null unless it's a percentage from 0 to 100, with up to two decimals. */
+export const aComision = (texto: string) => {
+  const limpio = texto.trim().replace(",", ".");
+  if (!/^\d+(\.\d{1,2})?$/.test(limpio)) return null;
+  const comision = Math.round(Number(limpio) * 100);
+  return comision <= 10000 ? comision : null;
+};
 
 export const lotesTxt = (n: number) => (n === 1 ? "1 lote" : `${n} lotes`);
 

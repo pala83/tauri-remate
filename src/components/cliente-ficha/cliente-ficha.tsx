@@ -2,6 +2,8 @@ import { cn } from "@qwik-ui/utils";
 import { component$, type QRL } from "@builder.io/qwik";
 import { Link } from "@builder.io/qwik-city";
 import { LuPlus } from "@qwikest/icons/lucide";
+import { Chip } from "~/components/chip/chip";
+import { Sello } from "~/components/sello/sello";
 import { CardActions } from "~/components/page-columns/card-actions";
 import { RolBadges } from "~/components/rol-badges/rol-badges";
 import { Avatar, Button, buttonVariants, Card } from "~/components/ui";
@@ -13,10 +15,11 @@ type FichaProps = {
   cliente: ClienteResumen;
   historial: Historial;
   onEditar$: QRL<() => void>;
+  onSinComision$: QRL<() => void>;
 };
 
 export const ClienteFicha = component$<FichaProps>(
-  ({ cliente, historial, onEditar$ }) => {
+  ({ cliente, historial, onEditar$, onSinComision$ }) => {
     const contacto = [cliente.telefono, cliente.email]
       .filter(Boolean)
       .join(" · ");
@@ -29,7 +32,12 @@ export const ClienteFicha = component$<FichaProps>(
           </Avatar.Root>
           <div class="flex min-w-64 flex-1 flex-col gap-2">
             <h3 class="font-serif text-4xl">{titulo(cliente.nombre)}</h3>
-            <RolBadges aporta={cliente.aporta} compro={cliente.compro} />
+            <div class="flex flex-wrap gap-2.5">
+              <RolBadges aporta={cliente.aporta} compro={cliente.compro} />
+              {cliente.sinComision && (
+                <Sello color="acento">Sin comisión</Sello>
+              )}
+            </div>
             {contacto && <p class="font-mono text-sm">{contacto}</p>}
             {cliente.referido && (
               <p class="text-muted-foreground">
@@ -61,6 +69,13 @@ export const ClienteFicha = component$<FichaProps>(
           <Button look="outline" onClick$={onEditar$}>
             Editar datos
           </Button>
+          <Chip
+            class="ml-auto"
+            activo={cliente.sinComision}
+            onCambiar$={onSinComision$}
+          >
+            Cliente sin comisión
+          </Chip>
         </CardActions>
       </Card.Root>
     );

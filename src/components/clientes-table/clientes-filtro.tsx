@@ -1,7 +1,7 @@
 import { component$, type Signal } from "@builder.io/qwik";
 import { ToggleGroup } from "~/components/ui";
 
-export type FiltroClientes = "todos" | "vende" | "compra";
+export type FiltroClientes = "todos" | "vende" | "compra" | "con-saldo";
 
 type FiltroProps = {
   filtro: Signal<FiltroClientes>;
@@ -29,6 +29,9 @@ export const ClientesFiltro = component$<FiltroProps>(({ filtro, cuentas }) => {
       </ToggleGroup.Item>
       <ToggleGroup.Item value="compra" size="lg" class={ITEM}>
         Compran <span>{cuentas.compra}</span>
+      </ToggleGroup.Item>
+      <ToggleGroup.Item value="con-saldo" size="lg" class={ITEM}>
+        Con saldo <span>{cuentas["con-saldo"]}</span>
       </ToggleGroup.Item>
     </ToggleGroup.Root>
   );

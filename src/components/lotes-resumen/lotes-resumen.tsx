@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-import { Tecla } from "~/components/tecla/tecla";
+import { Atajos } from "~/components/atajos/atajos";
 
 type LotesResumenProps = {
   total: number;
@@ -9,7 +9,7 @@ type LotesResumenProps = {
 
 const ATAJOS = [
   { teclas: ["Enter"], texto: "carga el lote" },
-  { teclas: ["Ctrl 1–5"], texto: "dueño reciente" },
+  { teclas: ["Ctrl 1-5"], texto: "dueño reciente" },
   { teclas: ["↑", "↓"], texto: "recorre el buscador" },
   { teclas: ["Esc"], texto: "cierra el buscador o la ficha" },
 ];
@@ -35,21 +35,7 @@ export const LotesResumen = component$<LotesResumenProps>(
             </div>
           </dl>
         </section>
-        <section class="mt-8">
-          <h2 class="mb-3 font-bold">Atajos</h2>
-          <dl class="flex flex-col gap-2.5">
-            {ATAJOS.map(({ teclas, texto }) => (
-              <div key={texto} class="flex items-baseline gap-2.5">
-                <dt class="flex shrink-0 gap-1">
-                  {teclas.map((tecla) => (
-                    <Tecla key={tecla}>{tecla}</Tecla>
-                  ))}
-                </dt>
-                <dd class="text-muted-foreground">{texto}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
+        <Atajos items={ATAJOS} />
       </div>
     );
   },

@@ -2,6 +2,7 @@ import { and, eq, getTableColumns, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/sqlite-core";
 import { getDb } from "./client";
 import { clientes, lotes, type NewLote } from "./schema";
+import { soltarPagos } from "./ventas";
 
 const dueno = alias(clientes, "dueno");
 const comprador = alias(clientes, "comprador");
@@ -59,10 +60,21 @@ export async function editarLote(
   valores: ValoresLote,
 ) {
   const db = await getDb();
+  const donde = and(eq(lotes.remateId, remateId), eq(lotes.numero, numero));
+  const [antes] = await db
+    .select({ compradorId: lotes.compradorId })
+    .from(lotes)
+    .where(donde);
+  await db.update(lotes).set(valores).where(donde);
+  const comprador = valores.compradorId ?? null;
+  if (antes.compradorId === comprador) return;
+  // What the old buyer paid for this lot stays on their account.
+  await soltarPagos(remateId, [numero]);
+  if (comprador === null) return;
   await db
     .update(lotes)
-    .set(valores)
-    .where(and(eq(lotes.remateId, remateId), eq(lotes.numero, numero)));
+    .set({ compradorId: comprador })
+    .where(and(eq(lotes.remateId, remateId), eq(lotes.vendidoCon, numero)));
 }
 
 export async function borrarLote(remateId: number, numero: number) {
