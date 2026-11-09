@@ -1,0 +1,78 @@
+# Builds the installers and attaches them to a draft Release.
+# Runs when a `v*` tag is pushed (see "Publicar una versión" in README.md).
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  tests:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun run test
+
+  instaladores:
+    needs: tests
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Built on 22.04 so the .deb also installs on older glibc (Debian 12, LMDE).
+          - platform: ubuntu-22.04
+            args: --bundles deb
+          - platform: windows-latest
+            args: --bundles nsis
+          # One .dmg for Intel and Apple Silicon Macs.
+          - platform: macos-latest
+            args: --target universal-apple-darwin --bundles dmg
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+      - name: Dependencias de Linux
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+      - run: bun install --frozen-lockfile
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tauriScript: bunx tauri
+          args: ${{ matrix.args }}
+          # The version comes from src-tauri/tauri.conf.json.
+          tagName: v__VERSION__
+          releaseName: Libro de Remates v__VERSION__
+          releaseDraft: true
+          prerelease: false
+          releaseBody: |
+            ## Descargas
+
+            - **Windows:** `Libro.de.Remates_…_x64-setup.exe`
+            - **Mac** (Intel o chip Apple): `Libro.de.Remates_…_universal.dmg`
+            - **Linux** (Debian, Ubuntu, Mint): `Libro.de.Remates_…_amd64.deb`
+
+            ## Instalar
+
+            La app no está firmada con un certificado, así que la primera vez el sistema avisa:
+
+            - **Windows:** SmartScreen dice «Windows protegió su PC». Tocá «Más información» y después «Ejecutar de todas formas».
+            - **Mac:** abrí el `.dmg` y arrastrá la app a Aplicaciones. Si al abrirla avisa que no se puede verificar, andá a Ajustes del Sistema › Privacidad y seguridad y tocá «Abrir igualmente».
+            - **Linux:** `sudo apt install ./Libro.de.Remates_*_amd64.deb`
+
+            Los datos quedan en el equipo. Actualizar a una versión nueva no los borra.
