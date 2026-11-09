@@ -18,9 +18,18 @@ export const MartilloComision = component$<ComisionProps>(({ m, acciones }) => {
   ];
 
   return (
-    <fieldset class="flex min-w-0 flex-col gap-2">
+    // A <legend> only names the fieldset as its first child, outside this row.
+    <fieldset
+      aria-labelledby="r-comision-titulo"
+      class="flex min-w-0 flex-col gap-2"
+    >
       <div class="flex items-baseline justify-between gap-3">
-        <legend class="font-mono text-sm leading-5 font-bold">Comisión</legend>
+        <span
+          id="r-comision-titulo"
+          class="font-mono text-sm leading-5 font-bold"
+        >
+          Comisión
+        </span>
         <div class="flex gap-2.5">
           {ATAJOS.map(({ valor, texto }) => (
             <Button
@@ -54,7 +63,7 @@ export const MartilloComision = component$<ComisionProps>(({ m, acciones }) => {
               class="w-16 px-2 text-right font-mono"
               bind:value={senal}
               onKeyDown$={(e) => {
-                if (e.key === "Enter") return acciones.adjudicar();
+                if (e.key === "Enter" && !e.repeat) return acciones.adjudicar();
               }}
             />
             <span class="font-mono text-sm" aria-hidden="true">

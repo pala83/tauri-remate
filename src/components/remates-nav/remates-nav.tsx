@@ -1,7 +1,6 @@
 import { component$ } from "@builder.io/qwik";
-import { LuPlus } from "@qwikest/icons/lucide";
 import { useAppState } from "~/components/app-state/app-state";
-import { NavItem } from "~/components/page-columns/nav-item";
+import { NavNuevo } from "~/components/page-columns/nav-nuevo";
 import { NavSection } from "~/components/page-columns/nav-section";
 import { esRealizada } from "~/lib/fechas";
 import { irA } from "~/lib/scroll";
@@ -18,13 +17,9 @@ export const RematesNav = component$(() => {
         {proximas.map((remate) => (
           <RemateNavItem key={remate.id} remate={remate} />
         ))}
-        <NavItem
-          class="text-sidebar-primary"
-          onClick$={() => irA("nuevo-remate", "remate-nombre")}
-        >
-          <LuPlus class="size-4 shrink-0" />
+        <NavNuevo onClick$={() => irA("nuevo-remate", "remate-nombre")}>
           Nuevo remate
-        </NavItem>
+        </NavNuevo>
       </NavSection>
       {realizadas.length > 0 && (
         <NavSection title="Realizadas">

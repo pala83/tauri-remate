@@ -1,0 +1,3 @@
+[test]
+# Replaces the Tauri plugins with an in-memory SQLite before any test imports `src/db`.
+preload = ["./tests/apoyo/base.ts"]

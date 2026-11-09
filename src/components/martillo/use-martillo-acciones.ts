@@ -1,16 +1,18 @@
 import { $ } from "@builder.io/qwik";
-import { devolverPagos, escribirVentas } from "~/db/ventas";
+import { escribirVentas } from "~/db/ventas";
 import { proximoSinVender } from "~/lib/martillo";
-import { ventaSeparar, ventasQuitar } from "~/lib/martillo-ventas";
 import type { MartilloState } from "./use-martillo";
 import { useAdjudicar } from "./use-adjudicar";
 import { enfocar, useMartilloEscritura } from "./use-martillo-escritura";
 import { useMartilloGrupo } from "./use-martillo-grupo";
+import { useQuitarVenta } from "./use-quitar-venta";
 
 export const useMartilloAcciones = (m: MartilloState) => {
-  const { escribir, fallar } = useMartilloEscritura(m);
-  const adjudicar = useAdjudicar(m);
+  const escritura = useMartilloEscritura(m);
+  const { fallar } = escritura;
+  const adjudicar = useAdjudicar(m, escritura);
   const grupo = useMartilloGrupo(m);
+  const { quitar, separar } = useQuitarVenta(m, escritura);
 
   const pasar = $(async () => {
     const actual = m.numero.value ?? 0;
@@ -24,45 +26,13 @@ export const useMartilloAcciones = (m: MartilloState) => {
     enfocar("r-precio");
   });
 
-  const quitar = $(async () => {
-    const lote = m.lote.value;
-    if (!lote) return;
-    try {
-      await escribir(lote.numero, ventasQuitar(m.lotes.value, lote.numero), [
-        lote.numero,
-      ]);
-    } catch (err) {
-      return fallar(err);
-    }
-    m.mensaje.value = {
-      tipo: "ok",
-      texto: `El N° ${lote.numero} quedó sin vender.`,
-    };
-    await m.cargarLote(lote.numero);
-  });
-
-  const separar = $(async () => {
-    const lote = m.lote.value;
-    if (!lote) return;
-    try {
-      await escribir(lote.numero, ventaSeparar(lote), []);
-    } catch (err) {
-      return fallar(err);
-    }
-    m.mensaje.value = {
-      tipo: "ok",
-      texto: `El N° ${lote.numero} se separó del conjunto y quedó sin vender.`,
-    };
-    await m.cargarLote(lote.numero);
-    enfocar("r-precio");
-  });
-
   const revertir = $(async () => {
     const guardado = m.deshacer.value;
     if (!guardado) return;
     try {
-      await escribirVentas(m.state.activoId!, guardado.ventas);
-      await devolverPagos(guardado.pagos);
+      await escribirVentas(m.state.activoId!, guardado.ventas, {
+        devolver: guardado.pagos,
+      });
       await m.leer();
     } catch (err) {
       return fallar(err);

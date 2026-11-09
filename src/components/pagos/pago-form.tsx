@@ -7,7 +7,7 @@ import {
 } from "~/components/page-columns/form-message";
 import { Segmentado } from "~/components/segmentado/segmentado";
 import { Button, Card, Input } from "~/components/ui";
-import { pesos } from "~/lib/textos";
+import { sugerenciaSaldo } from "~/components/liquidacion/saldo";
 import { PagoAplica } from "./pago-aplica";
 import { PagoMedio } from "./pago-medio";
 import { PagoMonto } from "./pago-monto";
@@ -18,19 +18,12 @@ const SENTIDOS = [
   { valor: "pago", texto: "Pago · se le paga al cliente" },
 ];
 
-const sugerencia = (saldo: number) => {
-  if (saldo > 0) return `Debe ${pesos(saldo)}`;
-  return saldo < 0 ? `Hay que pagarle ${pesos(saldo)}` : "Cuenta al día";
-};
-
 export const PagoForm = component$<{ estado: LiquidacionState }>(
   ({ estado }) => {
     const mensaje = useSignal<Mensaje>();
     const { form, registrar } = usePagoForm(estado, mensaje);
     const saldo = useComputed$(() => estado.liq.value?.saldo ?? 0);
-    const porLotes = useComputed$(
-      () => form.sentido === "cobro" && form.aplica === "lotes",
-    );
+    const porLotes = useComputed$(() => form.aplica === "lotes");
     const sumaLotes = useComputed$(() =>
       (estado.liq.value?.compras ?? [])
         .filter((c) => form.lotes.includes(c.numero))
@@ -45,7 +38,7 @@ export const PagoForm = component$<{ estado: LiquidacionState }>(
         <header class="bg-muted flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5 border-b px-6 py-4">
           <h3 class="font-serif text-2xl">Registrar un pago</h3>
           <span class="text-muted-foreground font-mono text-sm">
-            {sugerencia(saldo.value)}
+            {sugerenciaSaldo(saldo.value)}
           </span>
         </header>
         <div class="flex flex-col gap-4.5 px-6 pt-5 pb-5.5">
@@ -75,7 +68,6 @@ export const PagoForm = component$<{ estado: LiquidacionState }>(
               form={form}
               porLotes={porLotes.value}
               sumaLotes={sumaLotes.value}
-              saldo={saldo.value}
               onEnter$={registrar}
             />
           </div>

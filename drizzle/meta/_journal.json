@@ -43,6 +43,20 @@
       "when": 1793816293475,
       "tag": "0005_liquidaciones",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1794238030253,
+      "tag": "0006_clientes_nombre_unico",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1794242065381,
+      "tag": "0007_lotes_vendidos_no_se_borran",
+      "breakpoints": true
     }
   ]
 }

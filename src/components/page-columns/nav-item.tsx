@@ -9,7 +9,7 @@ export const NavItem = component$<NavItemProps>(({ current, ...props }) => {
     <Button
       {...props}
       look="ghost"
-      aria-current={current ? "true" : undefined}
+      aria-current={current ? "true" : "false"}
       class={cn(
         "aria-current:bg-muted h-auto min-h-11 w-full justify-start gap-2.5 px-3 py-2 text-left font-sans text-base font-normal aria-current:font-bold",
         props.class,

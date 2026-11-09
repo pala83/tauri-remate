@@ -1,8 +1,8 @@
 import { $, component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
 
-export type Theme = "light" | "dark";
+type Theme = "light" | "dark";
 
-export const THEME_STORAGE_KEY = "theme";
+const THEME_STORAGE_KEY = "theme";
 
 const applyTheme = (theme: Theme) => {
   const root = document.documentElement;

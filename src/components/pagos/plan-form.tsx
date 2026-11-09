@@ -1,24 +1,21 @@
-import { component$, type Signal } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import type { LiquidacionState } from "~/components/liquidacion/use-liquidacion";
 import { Field } from "~/components/page-columns/field";
-import {
-  FormMessage,
-  type Mensaje,
-} from "~/components/page-columns/form-message";
+import { FormMessage } from "~/components/page-columns/form-message";
 import { Button, Input } from "~/components/ui";
 import { pesos } from "~/lib/textos";
 import { PlanElecciones } from "./plan-elecciones";
 import { usePlanForm } from "./use-plan-form";
+import type { PlanCuotasState } from "./use-plan-cuotas";
 
 type PlanFormProps = {
   estado: LiquidacionState;
-  abierto: Signal<boolean>;
-  mensaje: Signal<Mensaje | undefined>;
+  plan: PlanCuotasState;
 };
 
 export const PlanForm = component$<PlanFormProps>(
-  ({ estado, abierto, mensaje }) => {
-    const plan = usePlanForm(estado, abierto, mensaje);
+  ({ estado, plan: cuotas }) => {
+    const plan = usePlanForm(estado, cuotas);
 
     return (
       <div class="flex flex-col gap-4 border-b px-6 py-5">
@@ -48,7 +45,7 @@ export const PlanForm = component$<PlanFormProps>(
           <Button
             look="outline"
             class="shadow-xs"
-            onClick$={() => (abierto.value = false)}
+            onClick$={() => (cuotas.abierto.value = false)}
           >
             Cancelar
           </Button>

@@ -5,7 +5,7 @@ import type { MartilloState } from "./use-martillo";
 
 const ATAJOS = [
   { teclas: ["Enter"], texto: "adjudica" },
-  { teclas: ["Ctrl 1–5"], texto: "comprador reciente" },
+  { teclas: ["Ctrl 1-5"], texto: "comprador reciente" },
   { teclas: ["Ctrl P"], texto: "pasa al próximo sin vender" },
   { teclas: ["Ctrl J"], texto: "suma el siguiente al conjunto" },
   { teclas: ["Esc"], texto: "cierra el buscador" },

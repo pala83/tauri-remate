@@ -1,31 +1,30 @@
-import {
-  $,
-  useComputed$,
-  useSignal,
-  useStore,
-  useVisibleTask$,
-} from "@builder.io/qwik";
+import { $, useComputed$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
 import { remateActivo, useAppState } from "~/components/app-state/app-state";
 import { clienteVacio } from "~/components/cliente-form/cliente-form-state";
 import type { FiltroClientes } from "~/components/clientes-table/clientes-filtro";
 import {
-  historialCliente,
-  listarClientes,
+  verClientes,
+  verHistorial,
   type ClienteResumen,
   type Historial,
 } from "~/db/clientes";
-import { useSaldos } from "./use-saldos";
 import { errorTxt } from "~/lib/textos";
+import { useFotoClientes, useGuardarClientes } from "~/store";
+import { useClienteBorrador } from "./use-cliente-borrador";
+import { useSaldos } from "./use-saldos";
 
 export const useClientesPage = () => {
   const { state } = useAppState();
+  const foto = useFotoClientes();
   const clientes = useSignal<ClienteResumen[]>([]);
-  const seleccionado = useSignal<number | null>(null);
+  // `cargar` goes back to the client chosen when the page was left.
+  const seleccionado = useSignal<number | null>(foto?.seleccionado ?? null);
   const historial = useSignal<Historial>();
-  const filtro = useSignal<FiltroClientes>("todos");
+  const filtro = useSignal<FiltroClientes>(foto?.filtro ?? "todos");
   const error = useSignal<string>();
   const cargado = useSignal(false);
-  const form = useStore(clienteVacio());
+  const { form, editar: editarCliente } = useClienteBorrador();
+  useGuardarClientes({ seleccionado, filtro });
   const activa = useComputed$(() => remateActivo(state));
   const actual = useComputed$(() =>
     clientes.value.find((c) => c.id === seleccionado.value),
@@ -33,19 +32,25 @@ export const useClientesPage = () => {
   const { saldos, deuda, leerSaldos } = useSaldos(clientes);
 
   const elegir = $(async (id: number) => {
+    // Another client's history must not show under this one while it loads.
+    if (seleccionado.value !== id) historial.value = undefined;
     seleccionado.value = id;
     try {
-      historial.value = await historialCliente(id);
+      const leido = await verHistorial(id);
+      // Clicking another client meanwhile: its own answer counts.
+      if (seleccionado.value === id) historial.value = leido;
     } catch (err) {
-      error.value = errorTxt(err);
+      if (seleccionado.value === id) error.value = errorTxt(err);
     }
   });
 
   const cargar = $(async (id?: number) => {
     try {
-      clientes.value = await listarClientes();
+      clientes.value = await verClientes();
       error.value = undefined;
-      const elegido = id ?? seleccionado.value ?? clientes.value[0]?.id;
+      const sigue = clientes.value.some((c) => c.id === seleccionado.value);
+      const elegido =
+        id ?? (sigue ? seleccionado.value : null) ?? clientes.value[0]?.id;
       if (elegido !== undefined) await elegir(elegido);
     } catch (err) {
       error.value = errorTxt(err);
@@ -81,6 +86,7 @@ export const useClientesPage = () => {
     filtro,
     error,
     form,
+    editarCliente,
     elegir,
     cargar,
     nuevo,

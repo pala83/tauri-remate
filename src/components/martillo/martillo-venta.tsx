@@ -3,6 +3,7 @@ import { DuenoBuscador } from "~/components/dueno-buscador/dueno-buscador";
 import { Avisos } from "~/components/liquidacion/liquidacion-avisos";
 import { Field } from "~/components/page-columns/field";
 import { Input } from "~/components/ui";
+import { pagoLotesVigentes } from "~/lib/liquidacion";
 import { avisosVenta } from "~/lib/martillo-avisos";
 import { calculoVenta } from "~/lib/martillo-marcha";
 import { aComision, aPesos } from "~/lib/textos";
@@ -36,7 +37,7 @@ export const MartilloVenta = component$<VentaProps>(({ m, acciones }) => {
           m.grupo.value,
           m.compradorId.value,
           aPesos(m.precio.value),
-          m.datos.value?.pagoLotes ?? [],
+          m.datos.value ? pagoLotesVigentes(m.datos.value) : [],
         )
       : [],
   );
@@ -53,7 +54,7 @@ export const MartilloVenta = component$<VentaProps>(({ m, acciones }) => {
             class="h-13 font-mono text-2xl font-bold"
             bind:value={m.precio}
             onKeyDown$={(e) => {
-              if (e.key === "Enter") return acciones.adjudicar();
+              if (e.key === "Enter" && !e.repeat) return acciones.adjudicar();
             }}
           />
         </Field>

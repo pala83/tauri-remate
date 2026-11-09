@@ -25,8 +25,9 @@ type AlertProps = PropsOf<"div"> & VariantProps<typeof alertVariants>;
 const Root = component$<AlertProps>(({ look, ...props }) => {
   return (
     <div
-      {...props}
+      // Before the spread, so a status message can say role="status".
       role="alert"
+      {...props}
       class={cn(alertVariants({ look }), props.class)}
     >
       <Slot />

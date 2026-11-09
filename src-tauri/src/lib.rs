@@ -9,6 +9,8 @@ pub fn run() {
     .plugin(tauri_plugin_opener::init())
     .invoke_handler(tauri::generate_handler![
       comandos::registrar_pago,
+      comandos::escribir_ventas,
+      comandos::unificar_clientes,
       comandos::imprimir
     ])
     .setup(|app| {

@@ -1,4 +1,4 @@
-import { $, useComputed$, useSignal, useTask$ } from "@builder.io/qwik";
+import { $, useComputed$, useSignal } from "@builder.io/qwik";
 import { useAppState } from "~/components/app-state/app-state";
 import { usePlanillaVirtual } from "~/components/lotes-planilla/use-planilla-virtual";
 import type { ClienteResumen } from "~/db/clientes";
@@ -11,16 +11,18 @@ import {
   ultimosDuenos,
   type FiltroLotes,
 } from "~/lib/lotes";
+import { useFotoLotes } from "~/store";
+import { useCrearDueno } from "./use-crear-dueno";
 import { useLotesAcciones, type MensajeCarga } from "./use-lotes-acciones";
-
-const DUENOS_RECIENTES = 5;
+import { useLotesMemoria } from "./use-lotes-memoria";
 
 export const useLotesPage = () => {
   const { state } = useAppState();
   const lotes = useSignal<LoteConClientes[]>([]);
   const clientes = useSignal<ClienteResumen[]>([]);
-  const busqueda = useSignal("");
-  const filtro = useSignal<FiltroLotes>("todos");
+  const foto = useFotoLotes();
+  const busqueda = useSignal(foto?.busqueda ?? "");
+  const filtro = useSignal<FiltroLotes>(foto?.filtro ?? "todos");
   const ficha = useSignal<number | null>(null);
   const reciente = useSignal<number | null>(null);
   const mensaje = useSignal<MensajeCarga>();
@@ -33,12 +35,20 @@ export const useLotesPage = () => {
   );
   const resumen = useComputed$(() => resumenDe(lotes.value));
   const bloques = useComputed$(() => bloquesDe(lotes.value));
-  const recientes = useComputed$(() =>
-    ultimosDuenos(lotes.value, DUENOS_RECIENTES),
-  );
+  const recientes = useComputed$(() => ultimosDuenos(lotes.value));
   const cuentas = useComputed$(() => cuentasPorDueno(lotes.value));
   const virtual = usePlanillaVirtual(filas);
+  const { borrador, volver } = useLotesMemoria({
+    foto,
+    lotes,
+    remateCargado,
+    busqueda,
+    filtro,
+    ficha,
+    virtual,
+  });
   const acciones = useLotesAcciones({
+    volver,
     lotes,
     clientes,
     ficha,
@@ -49,25 +59,14 @@ export const useLotesPage = () => {
     mensaje,
   });
 
-  // A different search or filter starts again from the top of the sheet.
-  useTask$(({ track }) => {
-    track(() => busqueda.value);
-    track(() => filtro.value);
-    virtual.inicio.value = 0;
-    if (virtual.caja.value) virtual.caja.value.scrollTop = 0;
-  });
-
-  const saltar = $((desde: number) => {
-    const fila = filas.value.findIndex((lote) => lote.numero >= desde);
-    if (fila !== -1) virtual.destino.value = { fila };
-  });
+  const saltar = $((desde: number) => virtual.mostrar(filas.value, desde));
 
   const irA = $((numero: number) => {
     busqueda.value = "";
     filtro.value = "todos";
     ficha.value = numero;
-    const fila = lotes.value.findIndex((lote) => lote.numero === numero);
-    virtual.destino.value = { fila };
+    // Without a search or filter, the sheet draws them all.
+    return virtual.mostrar(lotes.value, numero);
   });
 
   return {
@@ -77,6 +76,7 @@ export const useLotesPage = () => {
     busqueda,
     filtro,
     ficha,
+    borrador,
     reciente,
     mensaje,
     error,
@@ -90,6 +90,7 @@ export const useLotesPage = () => {
     saltar,
     irA,
     ...acciones,
+    crearDueno: useCrearDueno(clientes),
   };
 };
 

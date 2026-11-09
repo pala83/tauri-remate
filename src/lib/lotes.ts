@@ -1,6 +1,10 @@
 import type { LoteConClientes } from "~/db/lotes";
 import { normalizar, numeroLote, titulo } from "./textos";
 
+/** The two things every lot needs, said the same in the quick entry and the card. */
+export const FALTA_ARTICULO = "Escribí el nombre del artículo.";
+export const FALTA_DUENO = "Elegí el dueño del lote.";
+
 export type FiltroLotes = "todos" | "sin-detalles" | "sin-foto";
 
 const POR_BLOQUE = 100;
@@ -40,7 +44,13 @@ export const resumenDe = (lotes: LoteConClientes[]) => ({
 });
 
 /** Owners of the latest lots, most recent first and without repeating. */
-export const ultimosDuenos = (lotes: LoteConClientes[], cuantos: number) => {
+/** The quick entry offers this many recent owners, with Ctrl 1 to 5. */
+const DUENOS_RECIENTES = 5;
+
+export const ultimosDuenos = (
+  lotes: LoteConClientes[],
+  cuantos = DUENOS_RECIENTES,
+) => {
   const duenos: LoteConClientes[] = [];
   for (let i = lotes.length - 1; i >= 0 && duenos.length < cuantos; i--) {
     if (!duenos.some((lote) => lote.duenoId === lotes[i].duenoId)) {
@@ -68,7 +78,7 @@ export const bloquesDe = (lotes: LoteConClientes[]) => {
     bloques.push({
       desde,
       hasta,
-      rango: `${numeroLote(desde)} – ${numeroLote(hasta)}`,
+      rango: `${numeroLote(desde)} - ${numeroLote(hasta)}`,
       cuenta: lotes.filter((l) => l.numero >= desde && l.numero <= hasta).length,
     });
   }
@@ -79,3 +89,18 @@ export const distintos = (valores: (string | null)[]) =>
   [...new Set(valores.filter((valor): valor is string => !!valor))].sort(
     (a, b) => a.localeCompare(b, "es"),
   );
+
+/** The list after saving `lote`: `editarLote` also gives the lots sold with it its buyer. */
+export const conLoteGuardado = (
+  lotes: LoteConClientes[],
+  lote: LoteConClientes,
+) => {
+  const { numero, compradorId, compradorNombre } = lote;
+  return lotes.map((l) =>
+    l.numero === numero
+      ? lote
+      : l.vendidoCon === numero && compradorId !== null
+        ? { ...l, compradorId, compradorNombre }
+        : l,
+  );
+};

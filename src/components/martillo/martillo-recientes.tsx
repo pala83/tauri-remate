@@ -1,7 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import { Tecla } from "~/components/tecla/tecla";
 import { Button } from "~/components/ui";
-import { titulo } from "~/lib/textos";
+import { nombreDe } from "~/components/dueno-buscador/opciones-dueno";
 import type { MartilloState } from "./use-martillo";
 
 export const MartilloRecientes = component$<{ m: MartilloState }>(({ m }) => {
@@ -12,9 +12,7 @@ export const MartilloRecientes = component$<{ m: MartilloState }>(({ m }) => {
         Compradores recientes
       </span>
       {m.recientes.value.map((id, i) => {
-        const nombre = titulo(
-          m.clientes.value.find((c) => c.id === id)?.nombre ?? "",
-        );
+        const nombre = nombreDe(m.clientes.value, id);
         return (
           <Button
             key={id}

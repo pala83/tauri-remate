@@ -1,6 +1,8 @@
 import type { LoteConClientes } from "~/db/lotes";
-import type { DatosRemate } from "./liquidacion";
+import { sinComisionDe, type DatosRemate } from "./liquidacion";
+import { totalCompra, totalVenta } from "./liquidacion-lineas";
 import { vendido } from "./martillo";
+import { COMISION_INVALIDA } from "./martillo-ventas";
 import { pesos, porcentaje, titulo } from "./textos";
 
 type Lote = LoteConClientes;
@@ -13,11 +15,8 @@ const sinComisionEn = (
   const fijos = new Set(
     clientes.filter((c) => c.sinComision).map((c) => c.id),
   );
-  return (id: number | null) => {
-    if (id === null) return false;
-    const liq = datos.liquidaciones.find((q) => q.clienteId === id);
-    return liq ? liq.sinComision : fijos.has(id);
-  };
+  return (id: number | null) =>
+    id !== null && sinComisionDe(datos, id, fijos.has(id));
 };
 
 export const calculoVenta = (
@@ -30,14 +29,14 @@ export const calculoVenta = (
   comisionVenta: number | null,
 ) => {
   if (comisionCompra === null || comisionVenta === null)
-    return "La comisión tiene que ser un número de 0 a 100.";
+    return COMISION_INVALIDA;
   if (!precio) return "Escribí el precio y elegí el comprador.";
   const sinComision = sinComisionEn(datos, clientes);
   const compra = sinComision(compradorId) ? 0 : comisionCompra;
   const venta = sinComision(lote.duenoId) ? 0 : comisionVenta;
   const comprador = clientes.find((c) => c.id === compradorId);
-  const paga = Math.round((precio * (10000 + compra)) / 10000);
-  const recibe = Math.round((precio * (10000 - venta)) / 10000);
+  const paga = totalCompra(precio, compra);
+  const recibe = totalVenta(precio, venta);
   return (
     `${comprador ? titulo(comprador.nombre) : "El comprador"} paga ${pesos(paga)}` +
     (compra ? ` (+${porcentaje(compra)})` : " (sin comisión)") +
@@ -56,10 +55,11 @@ export const marchaDe = (
   for (const l of datos.lotes) {
     if (l.precioVenta === null) continue;
     martillado += l.precioVenta;
+    // The same rounding as the settlements, so both add up to the same.
+    const p = l.precioVenta;
     if (!sinComision(l.compradorId))
-      comision += Math.round((l.precioVenta * l.comisionCompra) / 10000);
-    if (!sinComision(l.duenoId))
-      comision += Math.round((l.precioVenta * l.comisionVenta) / 10000);
+      comision += totalCompra(p, l.comisionCompra) - p;
+    if (!sinComision(l.duenoId)) comision += p - totalVenta(p, l.comisionVenta);
   }
   const vendidos = datos.lotes.filter(vendido).length;
   return {

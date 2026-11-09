@@ -10,8 +10,8 @@ export const FormMessage = component$<{ mensaje?: Mensaje }>(({ mensaje }) => {
   const esError = mensaje.tipo === "error";
 
   return (
+    // The colors are its own: the alert's looks only add a border, which is off.
     <Alert.Root
-      look={esError ? "alert" : "primary"}
       role={esError ? "alert" : "status"}
       class={cn(
         "w-auto border-0 bg-transparent p-0 [&>svg]:top-0.5 [&>svg]:left-0",

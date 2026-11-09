@@ -18,7 +18,7 @@ export const Field = component$<FieldProps>(
           {label}
           {required && <span class="text-sidebar-primary"> *</span>}
           {optional && (
-            <span class="text-muted-foreground font-sans leading-5 font-normal italic">
+            <span class="text-muted-foreground font-sans font-normal italic">
               {" "}
               opcional
             </span>

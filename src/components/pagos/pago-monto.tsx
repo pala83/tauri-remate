@@ -8,13 +8,12 @@ type MontoProps = {
   form: PagoFormState;
   porLotes: boolean;
   sumaLotes: number;
-  saldo: number;
   onEnter$: QRL<() => void>;
 };
 
 /** Paying lots leaves nothing to type: the amount is what's left of them. */
 export const PagoMonto = component$<MontoProps>(
-  ({ form, porLotes, sumaLotes, saldo, onEnter$ }) => {
+  ({ form, porLotes, sumaLotes, onEnter$ }) => {
     if (porLotes) {
       return (
         <div class="flex min-w-55 flex-1 flex-col gap-1">
@@ -33,11 +32,12 @@ export const PagoMonto = component$<MontoProps>(
           inputMode="numeric"
           autocomplete="off"
           class="font-mono text-xl font-bold"
-          placeholder={saldo ? pesos(saldo) : "$ 0"}
+          // The form fills it with the balance: empty, it means nothing typed.
+          placeholder="$ 0"
           value={form.monto}
           onInput$={(_, el) => (form.monto = el.value)}
           onKeyDown$={(e) => {
-            if (e.key === "Enter") return onEnter$();
+            if (e.key === "Enter" && !e.repeat) return onEnter$();
           }}
         />
       </Field>

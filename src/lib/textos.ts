@@ -24,7 +24,11 @@ export const aComision = (texto: string) => {
   return comision <= 10000 ? comision : null;
 };
 
-export const lotesTxt = (n: number) => (n === 1 ? "1 lote" : `${n} lotes`);
+/** plural(3, "cuota") -> "3 cuotas"; plural(1, "pago válido", "pagos válidos") -> "1 pago válido". */
+export const plural = (n: number, uno: string, varios = `${uno}s`) =>
+  `${n} ${n === 1 ? uno : varios}`;
+
+export const lotesTxt = (n: number) => plural(n, "lote");
 
 export const iniciales = (nombre: string) =>
   nombre
@@ -46,9 +50,11 @@ export const normalizar = (texto: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
+/** Typed text without leading, trailing or repeated spaces. */
+export const espacios = (texto: string) => texto.trim().replace(/\s+/g, " ");
+
 /** A client's text as the database stores it. */
-export const textoCliente = (texto: string) =>
-  texto.trim().toLowerCase().replace(/\s+/g, " ");
+export const textoCliente = (texto: string) => espacios(texto).toLowerCase();
 
 /** "ana  ruiz" -> "Ana Ruiz": how the app shows a client's stored name. */
 export const titulo = (texto: string) =>

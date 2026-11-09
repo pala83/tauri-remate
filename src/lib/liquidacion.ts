@@ -15,13 +15,32 @@ export type DatosRemate = {
   pagoLotes: PagoLote[];
 };
 
+/** What payments that weren't annulled cover, lot by lot. */
+export const pagoLotesVigentes = (datos: DatosRemate) => {
+  const anulados = new Set(datos.pagos.filter((p) => p.anulado).map((p) => p.id));
+  return datos.pagoLotes.filter((pl) => !anulados.has(pl.pagoId));
+};
+
+/**
+ * Whether a client pays no commission in this remate: their settlement says,
+ * and before there is one, the client's own setting (copied to it on creation).
+ */
+export const sinComisionDe = (
+  datos: DatosRemate,
+  clienteId: number,
+  delCliente: boolean,
+) => {
+  const liq = datos.liquidaciones.find((q) => q.clienteId === clienteId);
+  return liq ? liq.sinComision : delCliente;
+};
+
 type ClienteLiquidado = Pick<Cliente, "id" | "sinComision">;
 
 export const liquidar = (datos: DatosRemate, cliente: ClienteLiquidado) => {
   const { lotes } = datos;
   const liq =
     datos.liquidaciones.find((q) => q.clienteId === cliente.id) ?? null;
-  const sinComision = liq ? liq.sinComision : cliente.sinComision;
+  const sinComision = sinComisionDe(datos, cliente.id, cliente.sinComision);
   const pagos = liq ? datos.pagos.filter((p) => p.liquidacionId === liq.id) : [];
   const validos = pagos.filter((p) => !p.anulado);
   const idsValidos = new Set(validos.map((p) => p.id));

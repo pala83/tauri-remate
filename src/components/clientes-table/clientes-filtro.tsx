@@ -1,38 +1,52 @@
 import { component$, type Signal } from "@builder.io/qwik";
-import { ToggleGroup } from "~/components/ui";
+import { Segmentado } from "~/components/segmentado/segmentado";
+import type { ClienteResumen } from "~/db/clientes";
 
 export type FiltroClientes = "todos" | "vende" | "compra" | "con-saldo";
 
+const OPCIONES: { valor: FiltroClientes; texto: string }[] = [
+  { valor: "todos", texto: "Todos" },
+  { valor: "vende", texto: "Venden" },
+  { valor: "compra", texto: "Compran" },
+  { valor: "con-saldo", texto: "Con saldo" },
+];
+
+/** "venden", as the list's title says it. */
+export const etiquetaFiltro = (filtro: FiltroClientes) =>
+  OPCIONES.find((o) => o.valor === filtro)!.texto.toLowerCase();
+
+/** The clients each filter shows. */
+export const listasClientes = (
+  clientes: ClienteResumen[],
+  saldos: Record<number, { saldo: number } | undefined>,
+): Record<FiltroClientes, ClienteResumen[]> => ({
+  todos: clientes,
+  vende: clientes.filter((c) => c.aporta > 0),
+  compra: clientes.filter((c) => c.compro > 0),
+  "con-saldo": clientes.filter((c) => saldos[c.id]?.saldo),
+});
+
 type FiltroProps = {
   filtro: Signal<FiltroClientes>;
-  cuentas: Record<FiltroClientes, number>;
+  listas: Record<FiltroClientes, ClienteResumen[]>;
 };
 
-const ITEM =
-  "gap-2 hover:bg-muted aria-pressed:hover:bg-foreground hover:bg-muted aria-pressed:hover:bg-foreground not-last:border-input rounded-none border-0 font-mono not-last:border-r";
-
-export const ClientesFiltro = component$<FiltroProps>(({ filtro, cuentas }) => {
+export const ClientesFiltro = component$<FiltroProps>(({ filtro, listas }) => {
   return (
-    <ToggleGroup.Root
-      value={filtro.value}
-      onChange$={(valor: string) => {
-        // Pressing the active option deselects it: go back to all.
-        filtro.value = (valor || "todos") as FiltroClientes;
-      }}
-      class="bg-popover mb-5 w-fit flex-wrap gap-0 overflow-hidden rounded-sm border shadow-xs"
-    >
-      <ToggleGroup.Item value="todos" size="lg" class={ITEM}>
-        Todos <span>{cuentas.todos}</span>
-      </ToggleGroup.Item>
-      <ToggleGroup.Item value="vende" size="lg" class={ITEM}>
-        Venden <span>{cuentas.vende}</span>
-      </ToggleGroup.Item>
-      <ToggleGroup.Item value="compra" size="lg" class={ITEM}>
-        Compran <span>{cuentas.compra}</span>
-      </ToggleGroup.Item>
-      <ToggleGroup.Item value="con-saldo" size="lg" class={ITEM}>
-        Con saldo <span>{cuentas["con-saldo"]}</span>
-      </ToggleGroup.Item>
-    </ToggleGroup.Root>
+    <div class="mb-5">
+      <Segmentado
+        etiqueta="Filtrar clientes"
+        valor={filtro.value}
+        opciones={OPCIONES.map((o) => ({
+          ...o,
+          cuenta: listas[o.valor].length,
+        }))}
+        onElegir$={(valor) => {
+          // Pressing the active option goes back to all of them.
+          filtro.value =
+            valor === filtro.value ? "todos" : (valor as FiltroClientes);
+        }}
+      />
+    </div>
   );
 });

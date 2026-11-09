@@ -2,31 +2,21 @@ import { useComputed$, useSignal, useTask$ } from "@builder.io/qwik";
 import { useAppState } from "~/components/app-state/app-state";
 import { usePlanillaVirtual } from "~/components/lotes-planilla/use-planilla-virtual";
 import type { ClienteResumen } from "~/db/clientes";
-import type { VentaLote } from "~/db/ventas";
-import type { PagoLote } from "~/db/schema";
 import type { DatosRemate } from "~/lib/liquidacion";
 import { filtrarMartillo, type FiltroMartillo } from "~/lib/martillo";
 import { marchaDe } from "~/lib/martillo-marcha";
 import { COMISION_DEFECTO } from "~/lib/martillo-ventas";
 import { campoComision } from "~/lib/textos";
+import { useFotoMartillo } from "~/store";
+import type { BaseVenta, Deshacer, MensajeMartillo } from "./martillo-tipos";
 import { useMartilloCarga } from "./use-martillo-carga";
-
-export type MensajeMartillo = {
-  tipo: "ok" | "error" | "info";
-  texto: string;
-};
-
-export type Deshacer = {
-  ventas: VentaLote[];
-  pagos: PagoLote[];
-  numero: number;
-};
 
 export const useMartillo = () => {
   const { state } = useAppState();
   const datos = useSignal<DatosRemate>();
   const clientes = useSignal<ClienteResumen[]>([]);
-  const filtro = useSignal<FiltroMartillo>("todos");
+  const foto = useFotoMartillo();
+  const filtro = useSignal<FiltroMartillo>(foto?.filtro ?? "todos");
   const numero = useSignal<number | null>(null);
   const precio = useSignal("");
   const compradorId = useSignal<number | null>(null);
@@ -38,6 +28,8 @@ export const useMartillo = () => {
   const mensaje = useSignal<MensajeMartillo>();
   const deshacer = useSignal<Deshacer>();
   const recien = useSignal<number | null>(null);
+  /** The fields as read from the database for lot `numero`, once they are. */
+  const base = useSignal<BaseVenta>();
 
   const lotes = useComputed$(() => datos.value?.lotes ?? []);
   const filas = useComputed$(() => filtrarMartillo(lotes.value, filtro.value));
@@ -56,6 +48,7 @@ export const useMartillo = () => {
   });
 
   const { cargarLote, leer } = useMartilloCarga({
+    foto,
     datos,
     clientes,
     filtro,
@@ -68,6 +61,9 @@ export const useMartillo = () => {
     recientes,
     mensaje,
     deshacer,
+    ultimo,
+    recien,
+    base,
     virtual,
   });
 
@@ -87,6 +83,7 @@ export const useMartillo = () => {
     mensaje,
     deshacer,
     recien,
+    base,
     lotes,
     filas,
     virtual,

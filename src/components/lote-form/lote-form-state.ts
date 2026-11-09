@@ -1,4 +1,6 @@
 import type { LoteConClientes, ValoresLote } from "~/db/lotes";
+import { FALTA_ARTICULO, FALTA_DUENO } from "~/lib/lotes";
+import { espacios } from "~/lib/textos";
 
 export type TriEstado = "" | "si" | "no";
 
@@ -17,10 +19,10 @@ export type LoteFormState = {
   vendidoCon: string;
 };
 
-export const loteVacio = (duenoId = ""): LoteFormState => ({
+export const loteVacio = (): LoteFormState => ({
   nombre: "",
   cantidad: "",
-  duenoId,
+  duenoId: "",
   funciona: "",
   esNuevo: "",
   materiales: "",
@@ -53,10 +55,20 @@ export const desdeLote = (lote: LoteConClientes): LoteFormState => ({
   vendidoCon: aTexto(lote.vendidoCon),
 });
 
+/** Empty, or whole pesos and units: the field's `min` and `step` are only hints. */
+const entero = (valor: string, desde: number) =>
+  valor === "" || (/^\d+$/.test(valor) && Number(valor) >= desde);
+
 /** Same rules as the table's CHECKs, with messages the user can act on. */
 export const errorDeLote = (form: LoteFormState) => {
-  if (!form.nombre.trim()) return "Falta el nombre del artículo.";
-  if (!form.duenoId) return "Elegí el dueño del artículo.";
+  if (!form.nombre.trim()) return FALTA_ARTICULO;
+  if (!form.duenoId) return FALTA_DUENO;
+  if (!entero(form.cantidad, 1))
+    return "La cantidad tiene que ser un número entero, desde 1.";
+  if (!entero(form.precioBase, 0))
+    return "El precio base tiene que ser un número entero de pesos.";
+  if (!entero(form.precioVenta, 1))
+    return "El precio de venta tiene que ser un número entero de pesos, mayor que 0.";
   const conPrecio = form.precioVenta !== "" || form.vendidoCon !== "";
   const vendido = form.compradorId !== "" || conPrecio;
   if (vendido && !form.compradorId) return "Elegí el comprador del lote.";
@@ -65,13 +77,13 @@ export const errorDeLote = (form: LoteFormState) => {
 };
 
 export const aValores = (form: LoteFormState): ValoresLote => ({
-  nombre: form.nombre.trim(),
+  nombre: espacios(form.nombre),
   cantidad: aEntero(form.cantidad),
   duenoId: Number(form.duenoId),
   funciona: deTri(form.funciona),
   esNuevo: deTri(form.esNuevo),
-  materiales: form.materiales.trim() || null,
-  marca: form.marca.trim() || null,
+  materiales: espacios(form.materiales) || null,
+  marca: espacios(form.marca) || null,
   precioBase: aEntero(form.precioBase),
   imagen: form.imagen || null,
   compradorId: aEntero(form.compradorId),

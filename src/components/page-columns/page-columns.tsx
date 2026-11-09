@@ -1,9 +1,14 @@
 import { component$, Slot } from "@builder.io/qwik";
+import { useVolverAlScroll } from "./use-volver-al-scroll";
 
 export const PageColumns = component$<{
   planilla?: boolean;
   desplazable?: boolean;
-}>(({ planilla, desplazable }) => {
+  /** The page whose scroll is kept when going to another tab and back. */
+  recordar?: string;
+}>(({ planilla, desplazable, recordar }) => {
+  const { main, contenido, onScroll } = useVolverAlScroll(recordar);
+
   return (
     <div class="min-h-0 flex-1 md:flex">
       <nav
@@ -13,6 +18,8 @@ export const PageColumns = component$<{
         <Slot name="nav" />
       </nav>
       <main
+        ref={main}
+        onScroll$={onScroll}
         class={[
           "textura min-w-0 flex-1",
           desplazable
@@ -23,6 +30,7 @@ export const PageColumns = component$<{
         ]}
       >
         <div
+          ref={contenido}
           class={[
             planilla
               ? "flex flex-col gap-3 px-4 pt-3 pb-4 md:h-full md:pl-6"

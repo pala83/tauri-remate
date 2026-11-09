@@ -1,9 +1,8 @@
 import { component$ } from "@builder.io/qwik";
 import type { Liquidado } from "~/lib/liquidacion";
 import { pesos } from "~/lib/textos";
-import { claseSaldo } from "./saldo";
+import { claseSaldo, firmado } from "./saldo";
 
-const firmado = (n: number) => `${n < 0 ? "− " : ""}${pesos(n)}`;
 const TENUE = "text-muted-foreground";
 
 export const LiquidacionTotales = component$<{ liq: Liquidado }>(({ liq }) => {

@@ -15,12 +15,13 @@ const TENUE = "text-muted-foreground";
 export const PlanillaFila = component$<PlanillaFilaProps>(
   ({ lote, seleccionada, reciente, onAbrir$ }) => {
     // Every tenth row has a stronger line, to help counting on the sheet.
-    const celda = [
-      "h-9 truncate px-2.5 border-r-1 border-sidebar-border last:border-r-0",
+    const base = [
+      "h-9 truncate px-2.5 border-sidebar-border",
       lote.numero % 10 === 0
         ? "border-b border-b-muted-foreground"
         : "border-b-1",
     ];
+    const celda = [base, "border-r-1 last:border-r-0"];
     const mono = [celda, "text-right font-mono text-sm"];
 
     return (
@@ -35,8 +36,8 @@ export const PlanillaFila = component$<PlanillaFilaProps>(
       >
         <td
           class={[
-            celda,
-            "border-r-sidebar-primary border-r-2 border-double p-0 text-right font-serif text-xl",
+            base,
+            "border-r-sidebar-primary border-r-2 border-double text-right font-serif text-xl",
           ]}
         >
           <button

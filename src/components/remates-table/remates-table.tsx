@@ -3,7 +3,7 @@ import { useAppState } from "~/components/app-state/app-state";
 import { DataTable } from "~/components/data-table/data-table";
 import { RemateRow } from "./remate-row";
 
-const COLUMNAS = ["Nombre", "Fecha", "Lotes", "Estado", " "];
+const COLUMNAS = ["Nombre", "Fecha", "Lotes", " "];
 
 export const RematesTable = component$(() => {
   const { state } = useAppState();

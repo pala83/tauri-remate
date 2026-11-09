@@ -1,14 +1,16 @@
-import { $, useSignal, useStore, useVisibleTask$ } from "@builder.io/qwik";
+import { $, useSignal, useStore } from "@builder.io/qwik";
 import type { LotesPageState } from "~/components/lotes-page/use-lotes-page";
-import { editarLote } from "~/db/lotes";
-import { sinDetalles } from "~/lib/lotes";
+import { editarLote, lotesDeVenta } from "~/db/lotes";
+import { filtrarLotes, sinDetalles } from "~/lib/lotes";
 import { errorTxt } from "~/lib/textos";
-import { aValores, desdeLote, errorDeLote, loteVacio } from "./lote-form-state";
+import { aValores, errorDeLote, loteVacio } from "./lote-form-state";
+import { useLoteLectura } from "./use-lote-lectura";
 
 export const useLoteForm = (page: LotesPageState, numero: number) => {
-  const lote = page.lotes.value.find((l) => l.numero === numero);
-  const form = useStore(lote ? desdeLote(lote) : loteVacio());
+  const form = useStore(loteVacio());
   const error = useSignal<string>();
+  const { base, cargando } = useLoteLectura(page, numero, form, error);
+  const guardando = useSignal(false);
 
   const cerrar = $(() => {
     page.ficha.value = null;
@@ -17,21 +19,26 @@ export const useLoteForm = (page: LotesPageState, numero: number) => {
 
   const guardar = $(async (seguir: boolean) => {
     const remateId = page.remateCargado.value;
+    if (!base.value || remateId === null || guardando.value) return;
     error.value = errorDeLote(form);
-    const vinculados = page.lotes.value.filter((l) => l.vendidoCon === numero);
-    if (
-      !error.value &&
-      vinculados.length &&
-      !(form.precioVenta && form.compradorId)
-    )
-      error.value = `Se vendió junto con el N° ${vinculados.map((l) => l.numero).join(", ")}: separalos antes de quitarle la venta.`;
-    if (error.value || remateId === null) return;
+    if (error.value) return;
+    guardando.value = true;
     try {
+      // From the database: the lots sold with this one, right now.
+      const vinculados = (await lotesDeVenta(remateId, [numero])).filter(
+        (l) => l.vendidoCon === numero,
+      );
+      if (vinculados.length && !(form.precioVenta && form.compradorId)) {
+        error.value = `Se vendió junto con el N° ${vinculados.map((l) => l.numero).join(", ")}: separalos antes de quitarle la venta.`;
+        return;
+      }
       await editarLote(remateId, numero, aValores(form));
       await page.refrescarLote(remateId, numero);
     } catch (err) {
       error.value = errorTxt(err);
       return;
+    } finally {
+      guardando.value = false;
     }
     const lotes = page.lotes.value;
     const proximo = seguir
@@ -47,20 +54,10 @@ export const useLoteForm = (page: LotesPageState, numero: number) => {
     };
     if (!proximo) return cerrar();
     page.ficha.value = proximo.numero;
-    const fila = page.filas.value.findIndex((l) => l.numero === proximo.numero);
-    if (fila !== -1) page.virtual.destino.value = { fila };
+    // From the list just saved: `filas` is computed and lags behind it.
+    const filas = filtrarLotes(lotes, page.busqueda.value, page.filtro.value);
+    await page.virtual.mostrar(filas, proximo.numero);
   });
 
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(({ cleanup }) => {
-    // On the next frame, once the panel has a size. The required fields stay
-    // in view, above the first one to complete.
-    const frame = requestAnimationFrame(() => {
-      document.getElementById("lote-cantidad")?.focus({ preventScroll: true });
-      document.getElementById("lote-form-cuerpo")?.scrollTo(0, 0);
-    });
-    cleanup(() => cancelAnimationFrame(frame));
-  });
-
-  return { form, error, cerrar, guardar };
+  return { form, base, error, cargando, cerrar, guardar };
 };

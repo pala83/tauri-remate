@@ -2,7 +2,11 @@ import { component$ } from "@builder.io/qwik";
 import { ClienteForm } from "~/components/cliente-form/cliente-form";
 import { ClientesNav } from "~/components/clientes-nav/clientes-nav";
 import { DeudaResumen } from "~/components/deuda-resumen/deuda-resumen";
-import { ClientesFiltro } from "~/components/clientes-table/clientes-filtro";
+import {
+  ClientesFiltro,
+  etiquetaFiltro,
+  listasClientes,
+} from "~/components/clientes-table/clientes-filtro";
 import { ClientesTable } from "~/components/clientes-table/clientes-table";
 import { FormMessage } from "~/components/page-columns/form-message";
 import { PageColumns } from "~/components/page-columns/page-columns";
@@ -17,35 +21,20 @@ const SECCIONES = [
   { id: "listado", label: "Listado" },
   { id: "ficha-cliente", label: "Ficha del cliente" },
   { id: "liquidacion", label: "Liquidación" },
-    { id: "pagos", label: "Pagos" },
+  { id: "pagos", label: "Pagos" },
   { id: "nuevo-cliente", label: "Nuevo cliente" },
 ];
 
-const ETIQUETAS = {
-  todos: "todos",
-  vende: "venden",
-  compra: "compran",
-  "con-saldo": "con saldo",
-};
-
 export const ClientesPage = component$(() => {
   const page = useClientesPage();
-  const todos = page.clientes.value;
-  const venden = todos.filter((c) => c.aporta > 0);
-  const compran = todos.filter((c) => c.compro > 0);
-  const conSaldo = todos.filter((c) => page.saldos.value[c.id]?.saldo);
-  const filas = {
-    todos,
-    vende: venden,
-    compra: compran,
-    "con-saldo": conSaldo,
-  }[page.filtro.value];
+  const listas = listasClientes(page.clientes.value, page.saldos.value);
+  const filas = listas[page.filtro.value];
 
   return (
-    <PageColumns>
+    <PageColumns recordar="clientes">
       <ClientesNav
         q:slot="nav"
-        titulo={`Clientes · ${ETIQUETAS[page.filtro.value]}`}
+        titulo={`Clientes · ${etiquetaFiltro(page.filtro.value)}`}
         clientes={filas}
         seleccionado={page.seleccionado.value}
         onElegir$={page.elegir}
@@ -68,15 +57,7 @@ export const ClientesPage = component$(() => {
           deuda={page.deuda.value}
         />
       )}
-      <ClientesFiltro
-        filtro={page.filtro}
-        cuentas={{
-          todos: todos.length,
-          vende: venden.length,
-          compra: compran.length,
-          "con-saldo": conSaldo.length,
-        }}
-      />
+      <ClientesFiltro filtro={page.filtro} listas={listas} />
       <ClientesTable
         clientes={filas}
         cargado={page.cargado.value}

@@ -23,7 +23,8 @@
     "start": "vite --open --mode ssr",
     "qwik": "qwik",
     "db.generate": "drizzle-kit generate",
-    "db.studio": "drizzle-kit studio"
+    "db.studio": "drizzle-kit studio",
+    "test": "bun test tests"
   },
   "devDependencies": {
     "@builder.io/qwik": "^1.20.3",
@@ -43,6 +44,7 @@
     "@tauri-apps/plugin-fs": "^2.7.1",
     "@tauri-apps/plugin-opener": "^2.7.2",
     "@tauri-apps/plugin-sql": "^2.6.0",
+    "@types/bun": "^1.4.4",
     "@types/node": "20.19.0",
     "class-variance-authority": "0.7.1",
     "drizzle-kit": "^0.31.11",

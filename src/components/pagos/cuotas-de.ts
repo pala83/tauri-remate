@@ -1,10 +1,9 @@
-import type { LiquidacionState } from "~/components/liquidacion/use-liquidacion";
+import type { Cuota } from "~/db/schema";
 import { estadoCuota } from "~/lib/cuotas";
+import type { Liquidado } from "~/lib/liquidacion";
 
 /** The installments of the settlement in view, with what's been paid of each. */
-export const cuotasDe = (estado: LiquidacionState) => {
-  const liq = estado.liq.value;
-  const cuotas = estado.datos.value?.cuotas ?? [];
+export const cuotasDe = (liq: Liquidado | null, cuotas: Cuota[]) => {
   if (!liq?.liq) return [];
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);

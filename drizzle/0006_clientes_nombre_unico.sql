@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `clientes_nombre_idx` ON `clientes` (`nombre`);

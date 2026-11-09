@@ -1,6 +1,6 @@
 import { component$, type QRL } from "@builder.io/qwik";
-import { LuPlus } from "@qwikest/icons/lucide";
 import { NavItem } from "~/components/page-columns/nav-item";
+import { NavNuevo } from "~/components/page-columns/nav-nuevo";
 import { NavSection } from "~/components/page-columns/nav-section";
 import type { ClienteResumen } from "~/db/clientes";
 import { irA } from "~/lib/scroll";
@@ -34,16 +34,14 @@ export const ClientesNav = component$<ClientesNavProps>((props) => {
           </span>
         </NavItem>
       ))}
-      <NavItem
-        class="text-sidebar-primary"
+      <NavNuevo
         onClick$={async () => {
           await props.onNuevo$();
           irA("nuevo-cliente", "cliente-nombre");
         }}
       >
-        <LuPlus class="size-4 shrink-0" />
         Nuevo cliente
-      </NavItem>
+      </NavNuevo>
     </NavSection>
   );
 });

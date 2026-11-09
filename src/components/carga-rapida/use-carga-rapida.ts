@@ -1,26 +1,18 @@
-import { $, useSignal, useTask$ } from "@builder.io/qwik";
-import { useLocation } from "@builder.io/qwik-city";
+import { $, useSignal } from "@builder.io/qwik";
 import type { LotesPageState } from "~/components/lotes-page/use-lotes-page";
-import { borrarLote, crearLote } from "~/db/lotes";
-import { errorTxt, titulo } from "~/lib/textos";
+import { borrarLote, crearLote, ultimoLote } from "~/db/lotes";
+import { FALTA_ARTICULO, FALTA_DUENO } from "~/lib/lotes";
+import { errorTxt, espacios, titulo } from "~/lib/textos";
+import { useCargaMemoria } from "./use-carga-memoria";
 
 const enfocar = (id: string) => document.getElementById(id)?.focus();
 
 export const useCargaRapida = (page: LotesPageState) => {
-  const { url } = useLocation();
   const articulo = useSignal("");
   const duenoId = useSignal<number | null>(null);
   const guardando = useSignal(false);
   const { mensaje } = page;
-
-  // On entering a remate, the owner is the one asked for or the last one used.
-  useTask$(({ track }) => {
-    const remate = track(() => page.remateCargado.value);
-    if (remate === null) return;
-    const pedido = Number(url.searchParams.get("dueno"));
-    duenoId.value = pedido || (page.lotes.value.at(-1)?.duenoId ?? null);
-    articulo.value = "";
-  });
+  useCargaMemoria(page, articulo, duenoId);
 
   const elegirDueno = $((id: number) => {
     duenoId.value = id;
@@ -30,28 +22,23 @@ export const useCargaRapida = (page: LotesPageState) => {
 
   const cargar = $(async () => {
     const remateId = page.remateCargado.value;
-    const nombre = articulo.value.trim().replace(/\s+/g, " ");
+    const nombre = espacios(articulo.value);
     // Enter again while saving must not create a second lot.
     if (guardando.value || remateId === null) return;
     if (!nombre) {
-      mensaje.value = {
-        tipo: "error",
-        texto: "Escribí el nombre del artículo.",
-      };
+      mensaje.value = { tipo: "error", texto: FALTA_ARTICULO };
       return enfocar("carga-articulo");
     }
     if (duenoId.value === null) {
-      mensaje.value = { tipo: "error", texto: "Elegí el dueño del lote." };
+      mensaje.value = { tipo: "error", texto: FALTA_DUENO };
       return enfocar("carga-dueno");
     }
 
     guardando.value = true;
     articulo.value = "";
+    let numero: number | undefined;
     try {
-      const numero = await crearLote(remateId, {
-        nombre,
-        duenoId: duenoId.value,
-      });
+      numero = await crearLote(remateId, { nombre, duenoId: duenoId.value });
       const lote = await page.agregarLote(remateId, numero);
       mensaje.value = {
         tipo: "ok",
@@ -59,9 +46,12 @@ export const useCargaRapida = (page: LotesPageState) => {
         deshacer: numero,
       };
     } catch (err) {
-      // What was typed meanwhile, if anything, stays.
-      if (!articulo.value) articulo.value = nombre;
-      mensaje.value = { tipo: "error", texto: errorTxt(err) };
+      // Once created, giving the text back would make Enter create it twice.
+      if (numero === undefined && !articulo.value) articulo.value = nombre;
+      const texto = numero
+        ? `El N° ${numero} quedó guardado, pero no se pudo mostrar: ${errorTxt(err)}`
+        : errorTxt(err);
+      mensaje.value = { tipo: "error", texto };
     } finally {
       guardando.value = false;
       enfocar("carga-articulo");
@@ -71,9 +61,12 @@ export const useCargaRapida = (page: LotesPageState) => {
   const deshacer = $(async () => {
     const numero = mensaje.value?.deshacer;
     const remateId = page.remateCargado.value;
-    const ultimo = page.lotes.value.at(-1);
-    if (!numero || remateId === null || ultimo?.numero !== numero) return;
+    if (!numero || remateId === null) return;
     try {
+      // From the database: only the last lot can be undone, and its text
+      // goes back to the field as it was saved.
+      const ultimo = await ultimoLote(remateId);
+      if (ultimo?.numero !== numero) return;
       await borrarLote(remateId, numero);
       await page.quitarLote(numero);
       articulo.value = ultimo.nombre;

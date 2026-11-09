@@ -7,7 +7,7 @@ export const RemateStat = component$<{
   acento?: boolean;
 }>(({ label, value, acento }) => {
   return (
-    <div class="border-sidebar-border px-6 py-4 not-last:border-r-1 md:px-8">
+    <div class="border-sidebar-border px-6 py-4 sm:not-last:border-r-1 md:px-8">
       <dt class="text-muted-foreground font-mono text-xs tracking-wider uppercase">
         {label}
       </dt>

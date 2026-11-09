@@ -33,7 +33,7 @@ export const MartilloFila = component$<FilaProps>(
         ]}
         onClick$={() => onAbrir$(lote.numero)}
       >
-        <td class={[celda, "p-0 text-right font-serif text-xl"]}>
+        <td class={[celda, "text-right font-serif text-xl"]}>
           <button
             type="button"
             aria-label={`Lote ${lote.numero}: ${lote.nombre}. Llevar al martillo`}

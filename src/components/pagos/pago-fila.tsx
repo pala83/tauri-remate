@@ -4,13 +4,7 @@ import { Button } from "~/components/ui";
 import type { Pago } from "~/db/schema";
 import { fechaCorta } from "~/lib/fechas";
 import { pesos } from "~/lib/textos";
-
-const MEDIOS = {
-  efectivo: "Efectivo",
-  transferencia: "Transferencia",
-  cheque: "Cheque",
-  otro: "Otro medio",
-};
+import { MEDIOS } from "./medios";
 
 const TACHADO = "text-muted-foreground line-through";
 

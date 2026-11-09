@@ -1,6 +1,5 @@
-import { and, eq, inArray, sql } from "drizzle-orm";
-import { getDb } from "./client";
-import { pagoLotes, type PagoLote } from "./schema";
+import { olvidarLotes } from "./olvidos";
+import type { PagoLote } from "./schema";
 
 export type VentaLote = {
   numero: number;
@@ -11,45 +10,29 @@ export type VentaLote = {
   comisionVenta: number;
 };
 
-/** A single UPDATE, so a lot and those sold with it change together. */
-export async function escribirVentas(remateId: number, ventas: VentaLote[]) {
-  const db = await getDb();
-  await db.run(sql`
-    update lotes set
-      comprador_id = j.comprador,
-      precio_venta = j.precio,
-      vendido_con = j.con,
-      comision_compra = j.compra,
-      comision_venta = j.venta
-    from (
-      select
-        json_extract(value, '$.numero') as numero,
-        json_extract(value, '$.compradorId') as comprador,
-        json_extract(value, '$.precioVenta') as precio,
-        json_extract(value, '$.vendidoCon') as con,
-        json_extract(value, '$.comisionCompra') as compra,
-        json_extract(value, '$.comisionVenta') as venta
-      from json_each(${JSON.stringify(ventas)})
-    ) as j
-    where lotes.remate_id = ${remateId} and lotes.numero = j.numero`);
-}
+type Cambios = {
+  /** Lots whose buyer changes: what was paid for them stays on the old buyer's account. */
+  soltar?: number[];
+  /** Payment rows put back, when undoing. */
+  devolver?: PagoLote[];
+};
 
-/** Lots no longer bought by that client release what was paid for them. */
-export async function soltarPagos(remateId: number, numeros: number[]) {
-  const db = await getDb();
-  return db
-    .delete(pagoLotes)
-    .where(
-      and(
-        eq(pagoLotes.remateId, remateId),
-        inArray(pagoLotes.loteNumero, numeros),
-      ),
-    )
-    .returning();
-}
-
-export async function devolverPagos(filas: PagoLote[]) {
-  if (filas.length === 0) return;
-  const db = await getDb();
-  await db.insert(pagoLotes).values(filas);
+/**
+ * Writes a sale that changes several lots, all at once or not at all: it's the
+ * `escribir_ventas` Rust command because the plugin's pool can't hold a
+ * transaction. Lots sold with one of these take its buyer. Returns the payment
+ * rows it removed, which `devolver` puts back.
+ */
+export async function escribirVentas(
+  remateId: number,
+  ventas: VentaLote[],
+  { soltar = [], devolver = [] }: Cambios = {},
+) {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<PagoLote[]>("escribir_ventas", {
+    remateId,
+    ventas,
+    soltar,
+    devolver,
+  }).finally(() => olvidarLotes(remateId));
 }

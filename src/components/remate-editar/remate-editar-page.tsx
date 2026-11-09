@@ -4,6 +4,7 @@ import { LuArrowLeft } from "@qwikest/icons/lucide";
 import { cn } from "@qwik-ui/utils";
 import { remateActivo, useAppState } from "~/components/app-state/app-state";
 import { PageColumns } from "~/components/page-columns/page-columns";
+import { FormMessage } from "~/components/page-columns/form-message";
 import { PageIntro } from "~/components/page-columns/page-intro";
 import { buttonVariants, Skeleton } from "~/components/ui";
 import { RemateEditarForm } from "./remate-editar-form";
@@ -13,7 +14,7 @@ export const RemateEditarPage = component$(() => {
   const activa = useComputed$(() => remateActivo(state));
 
   return (
-    <PageColumns>
+    <PageColumns recordar="remate">
       <Link
         q:slot="nav"
         href="/"
@@ -27,11 +28,16 @@ export const RemateEditarPage = component$(() => {
         title="Editar remate"
         text="Corregí el nombre o la fecha, y agregá el lugar con su link de Google Maps."
       />
+      {state.error && (
+        <div class="mt-6">
+          <FormMessage mensaje={{ tipo: "error", texto: state.error }} />
+        </div>
+      )}
       {!state.cargado && <Skeleton class="mt-10 h-48" />}
       {activa.value && (
         <RemateEditarForm key={activa.value.id} remate={activa.value} />
       )}
-      {state.cargado && !activa.value && (
+      {state.cargado && !state.error && !activa.value && (
         <p class="text-muted-foreground mt-10 text-lg italic">
           No hay ningún remate para editar. Creá uno en Remates.
         </p>

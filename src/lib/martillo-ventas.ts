@@ -6,6 +6,11 @@ type Lote = LoteConClientes;
 /** 10%, in hundredths of a percent: what every sale starts from, on both sides. */
 export const COMISION_DEFECTO = 1000;
 
+export const COMISION_INVALIDA = "La comisión tiene que ser un número de 0 a 100.";
+
+/** How many recent buyers the hammer offers with Ctrl 1–5. */
+export const RECIENTES = 5;
+
 const ventaDe = (l: Lote): VentaLote => ({
   numero: l.numero,
   compradorId: l.compradorId,

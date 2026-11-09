@@ -1,4 +1,5 @@
 import { component$ } from "@builder.io/qwik";
+import { hijosDe } from "~/lib/martillo";
 import { MartilloFila } from "./martillo-fila";
 import type { MartilloState } from "./use-martillo";
 import { enfocarLote } from "./use-martillo-escritura";
@@ -61,10 +62,7 @@ export const MartilloPlanilla = component$<{ m: MartilloState }>(({ m }) => {
                 <MartilloFila
                   key={lote.numero}
                   lote={lote}
-                  hijos={
-                    m.lotes.value.filter((l) => l.vendidoCon === lote.numero)
-                      .length
-                  }
+                  hijos={hijosDe(m.lotes.value, lote.numero).length}
                   seleccionada={m.numero.value === lote.numero}
                   reciente={m.recien.value === lote.numero}
                   onAbrir$={async (n) => {

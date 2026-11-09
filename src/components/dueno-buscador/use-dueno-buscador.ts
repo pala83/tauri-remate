@@ -1,12 +1,8 @@
 import { $, useComputed$, useSignal, useTask$ } from "@builder.io/qwik";
-import type { DuenoBuscadorProps } from "./dueno-buscador";
+import type { DuenoBuscadorProps } from "./dueno-buscador-props";
+import { errorTxt } from "~/lib/textos";
 import { nombreDe, opcionesDe, type OpcionDueno } from "./opciones-dueno";
 
-/**
- * The list is Qwik UI's combobox, which handles the mouse. The field is a plain
- * Input because Combobox.Input adds its own key handlers to any we pass: Enter
- * would choose twice, and it clears the highlight when typing.
- */
 export const useDuenoBuscador = (props: DuenoBuscadorProps) => {
   const texto = useSignal("");
   const editando = useSignal(false);
@@ -14,12 +10,12 @@ export const useDuenoBuscador = (props: DuenoBuscadorProps) => {
   const activo = useSignal(0);
   const seleccion = useSignal("");
   const eligiendo = useSignal(false);
+  const error = useSignal("");
 
   useTask$(({ track }) => {
     const id = track(() => props.duenoId);
     const clientes = track(() => props.clientes);
-    if (track(() => editando.value)) return;
-    texto.value = nombreDe(clientes, id);
+    if (!track(() => editando.value)) texto.value = nombreDe(clientes, id);
   });
 
   const lista = useComputed$(() =>
@@ -46,10 +42,13 @@ export const useDuenoBuscador = (props: DuenoBuscadorProps) => {
     // Enter again while creating the client can't create a second one.
     if (eligiendo.value) return;
     eligiendo.value = true;
+    error.value = "";
     try {
       const id = opcion.id ?? (await props.onNuevo$(opcion.nombre));
       await cerrar();
       await props.onElegir$(id, conEnter);
+    } catch (err) {
+      error.value = errorTxt(err);
     } finally {
       eligiendo.value = false;
     }
@@ -96,5 +95,6 @@ export const useDuenoBuscador = (props: DuenoBuscadorProps) => {
     teclas,
     escribir,
     alCambiar,
+    error,
   };
 };

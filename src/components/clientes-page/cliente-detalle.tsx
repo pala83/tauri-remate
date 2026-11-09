@@ -4,9 +4,10 @@ import { LiquidacionSeccion } from "~/components/liquidacion/liquidacion-seccion
 import { useLiquidacion } from "~/components/liquidacion/use-liquidacion";
 import { SectionHeading } from "~/components/page-columns/section-heading";
 import { PagosSeccion } from "~/components/pagos/pagos-seccion";
-import { listarClientes, marcarSinComision } from "~/db/clientes";
+import { desdeCliente } from "~/components/cliente-form/cliente-form-state";
+import { leerCliente, listarClientes, marcarSinComision } from "~/db/clientes";
 import { irA } from "~/lib/scroll";
-import { errorTxt, titulo } from "~/lib/textos";
+import { errorTxt } from "~/lib/textos";
 import type { ClientesPageState } from "./use-clientes-page";
 
 /** Everything about the chosen client: their card, settlement and payments. */
@@ -15,24 +16,25 @@ export const ClienteDetalle = component$<{ page: ClientesPageState }>(
     const actual = page.actual.value;
     const liquidacion = useLiquidacion(page.actual, page.leerSaldos);
 
-    const editar = $(() => {
-      const cliente = page.actual.value;
-      if (!cliente) return;
-      Object.assign(page.form, {
-        id: cliente.id,
-        nombre: titulo(cliente.nombre),
-        telefono: cliente.telefono ?? "",
-        email: cliente.email ?? "",
-        referido: titulo(cliente.referido ?? ""),
-      });
+    // Both read the client from the database, not from the list on screen.
+    const editar = $(async () => {
+      const id = page.actual.value?.id;
+      if (id === undefined) return;
+      try {
+        await page.editarCliente(desdeCliente(await leerCliente(id)));
+      } catch (err) {
+        page.error.value = errorTxt(err);
+        return;
+      }
       irA("nuevo-cliente", "cliente-nombre");
     });
 
     const cambiarSinComision = $(async () => {
-      const cliente = page.actual.value;
-      if (!cliente) return;
+      const id = page.actual.value?.id;
+      if (id === undefined) return;
       try {
-        await marcarSinComision(cliente.id, !cliente.sinComision);
+        const { sinComision } = await leerCliente(id);
+        await marcarSinComision(id, !sinComision);
         page.clientes.value = await listarClientes();
       } catch (err) {
         page.error.value = errorTxt(err);
@@ -50,7 +52,8 @@ export const ClienteDetalle = component$<{ page: ClientesPageState }>(
             onSinComision$={cambiarSinComision}
           />
         ) : (
-          page.cargado.value && (
+          page.cargado.value &&
+          !actual && (
             <p class="text-muted-foreground text-lg italic">
               Elegí un cliente del listado.
             </p>
@@ -58,12 +61,7 @@ export const ClienteDetalle = component$<{ page: ClientesPageState }>(
         )}
         {page.actual.value && (
           <>
-            <LiquidacionSeccion
-              estado={liquidacion}
-              cliente={page.actual}
-              clienteId={page.actual.value.id}
-              nombre={page.actual.value.nombre}
-            />
+            <LiquidacionSeccion estado={liquidacion} cliente={page.actual} />
             <PagosSeccion estado={liquidacion} />
           </>
         )}

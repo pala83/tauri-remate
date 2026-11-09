@@ -15,6 +15,9 @@ export const useMartilloGrupo = (m: MartilloState) => {
   });
 
   const agregarSiguiente = $(async () => {
+    // A lot sold with another has no group panel: nothing would show it.
+    const actual = m.lote.value;
+    if (!actual || actual.vendidoCon !== null) return;
     const tope = Math.max(m.numero.value ?? 0, ...m.grupo.value);
     const sigue = m.lotes.value.find(
       (l) => l.numero > tope && l.compradorId === null,

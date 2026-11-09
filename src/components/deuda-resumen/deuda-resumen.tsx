@@ -1,8 +1,8 @@
 import { component$ } from "@builder.io/qwik";
 import { Card } from "~/components/ui";
-import { pesos } from "~/lib/textos";
+import { plural, pesos } from "~/lib/textos";
 
-export type Deuda = {
+type Deuda = {
   deben: number;
   nDeben: number;
   aPagar: number;
@@ -11,7 +11,6 @@ export type Deuda = {
   pagado: number;
 };
 
-const clientes = (n: number) => (n === 1 ? "1 cliente" : `${n} clientes`);
 const TITULO =
   "text-muted-foreground font-mono text-xs tracking-wider uppercase";
 const NOTA = "text-muted-foreground font-mono text-sm";
@@ -34,14 +33,14 @@ export const DeudaResumen = component$<{ remate: string; deuda: Deuda }>(
               <dd class="text-alert font-serif text-3xl">
                 {pesos(deuda.deben)}
               </dd>
-              <dd class={NOTA}>{clientes(deuda.nDeben)}</dd>
+              <dd class={NOTA}>{plural(deuda.nDeben, "cliente")}</dd>
             </div>
             <div class={CELDA}>
               <dt class={TITULO}>A pagar a dueños</dt>
               <dd class="text-sidebar-accent font-serif text-3xl">
                 {pesos(deuda.aPagar)}
               </dd>
-              <dd class={NOTA}>{clientes(deuda.nAPagar)}</dd>
+              <dd class={NOTA}>{plural(deuda.nAPagar, "cliente")}</dd>
             </div>
             <div class={CELDA}>
               <dt class={TITULO}>Cobrado</dt>

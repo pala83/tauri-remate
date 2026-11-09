@@ -1,9 +1,8 @@
-import { component$, useComputed$ } from "@builder.io/qwik";
+import { component$, useComputed$, useTask$ } from "@builder.io/qwik";
 import { Chip } from "~/components/chip/chip";
 import type { LiquidacionState } from "~/components/liquidacion/use-liquidacion";
 import { Segmentado } from "~/components/segmentado/segmentado";
 import { pesos } from "~/lib/textos";
-import { cuotasDe } from "./cuotas-de";
 import type { PagoFormState } from "./use-pago-form";
 
 type AplicaProps = { form: PagoFormState; estado: LiquidacionState };
@@ -14,7 +13,7 @@ export const PagoAplica = component$<AplicaProps>(({ form, estado }) => {
     (estado.liq.value?.compras ?? []).filter((c) => c.resta > 0),
   );
   const cuotas = useComputed$(() =>
-    cuotasDe(estado).filter((c) => c.resta > 0),
+    estado.cuotas.value.filter((c) => c.resta > 0),
   );
   const opciones = useComputed$(() => [
     { valor: "cuenta", texto: "A cuenta" },
@@ -25,24 +24,26 @@ export const PagoAplica = component$<AplicaProps>(({ form, estado }) => {
       ? [{ valor: "cuota", texto: "Una cuota" }]
       : []),
   ]);
-  const aplica = useComputed$(() =>
-    opciones.value.some((o) => o.valor === form.aplica)
-      ? form.aplica
-      : "cuenta",
-  );
+  // An option that's gone (the last lot was paid, it's now a payment) goes
+  // back to "A cuenta" in the form itself, which the amount and saving read.
+  useTask$(({ track }) => {
+    const lista = track(() => opciones.value);
+    if (!lista.some((o) => o.valor === track(() => form.aplica)))
+      form.aplica = "cuenta";
+  });
 
   return (
     <div class="flex flex-col gap-2">
       <span class="font-mono text-sm font-bold">Se aplica a</span>
       <Segmentado
         etiqueta="Se aplica a"
-        valor={aplica.value}
+        valor={form.aplica}
         opciones={opciones.value}
         onElegir$={(valor) => {
           form.aplica = valor as PagoFormState["aplica"];
         }}
       />
-      {aplica.value === "lotes" && (
+      {form.aplica === "lotes" && (
         <div class="mt-1 flex flex-wrap gap-2.5">
           {impagos.value.map((c) => (
             <Chip
@@ -59,16 +60,21 @@ export const PagoAplica = component$<AplicaProps>(({ form, estado }) => {
           ))}
         </div>
       )}
-      {aplica.value === "cuota" && (
+      {form.aplica === "cuota" && (
         <div class="mt-1 flex flex-col items-start gap-2.5">
           {cuotas.value.map((c) => (
             <Chip
               key={c.cuota.id}
               redondo
               activo={form.cuotaId === c.cuota.id}
-              onCambiar$={() => {
-                form.cuotaId = c.cuota.id;
-                form.monto = String(c.resta);
+              onCambiar$={async () => {
+                const id = c.cuota.id;
+                form.cuotaId = id;
+                // What's left of it, from the database: it fills the amount.
+                const vigente = await estado.vigente();
+                const resta = vigente?.cuotas.find((x) => x.cuota.id === id);
+                if (resta && form.cuotaId === id)
+                  form.monto = String(resta.resta);
               }}
             >
               Cuota {c.orden} · {pesos(c.resta)}

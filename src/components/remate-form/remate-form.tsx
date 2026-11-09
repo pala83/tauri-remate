@@ -8,50 +8,45 @@ import {
 } from "~/components/page-columns/form-message";
 import { Button, Card } from "~/components/ui";
 import { crearRemate } from "~/db/remates";
-import { errorRemate, valoresRemate } from "~/lib/remates";
 import { irA } from "~/lib/scroll";
-import { errorTxt } from "~/lib/textos";
 import { RemateFields } from "./remate-fields";
+import { useRemateCampos } from "./use-remate-campos";
 
 export const RemateForm = component$(() => {
   const { recargar$, elegir$ } = useAppState();
-  const nombre = useSignal("");
-  const fecha = useSignal("");
-  const lugar = useSignal("");
+  const campos = useRemateCampos("remate-nuevo", null);
   const mensaje = useSignal<Mensaje>();
 
   const crear = $(async () => {
-    const campos = {
-      nombre: nombre.value,
-      fecha: fecha.value,
-      lugar: lugar.value,
-    };
-    const error = errorRemate(campos);
-    if (error) {
-      mensaje.value = { tipo: "error", texto: error };
-      return;
-    }
-    try {
-      const valores = valoresRemate(campos);
-      const id = await crearRemate(valores);
-      await recargar$();
-      await elegir$(id);
-      nombre.value = fecha.value = lugar.value = "";
-      mensaje.value = {
-        tipo: "ok",
-        texto: `${valores.nombre} quedó creada y seleccionada.`,
-      };
-      irA("remate-activo");
-    } catch (err) {
-      mensaje.value = { tipo: "error", texto: errorTxt(err) };
-    }
+    const error = await campos.enviar(
+      $(async (valores) => {
+        const id = await crearRemate(valores);
+        await recargar$();
+        await elegir$(id);
+        await campos.vaciar();
+        mensaje.value = {
+          tipo: "ok",
+          texto: `${valores.nombre} quedó creada y seleccionada.`,
+        };
+        irA("remate-activo");
+      }),
+    );
+    if (error) mensaje.value = { tipo: "error", texto: error };
   });
 
   return (
     <Card.Root class="overflow-hidden shadow-lg">
-      <RemateFields nombre={nombre} fecha={fecha} lugar={lugar} />
+      <RemateFields
+        nombre={campos.nombre}
+        fecha={campos.fecha}
+        lugar={campos.lugar}
+      />
       <CardActions>
-        <Button class="gap-2" onClick$={crear}>
+        <Button
+          class="gap-2"
+          disabled={campos.guardando.value}
+          onClick$={crear}
+        >
           <LuPlus class="size-4" />
           Crear remate
         </Button>

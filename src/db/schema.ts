@@ -17,17 +17,22 @@ export const remates = sqliteTable("remates", {
   lugar: text("lugar"),
 });
 
-export const clientes = sqliteTable("clientes", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  nombre: text("nombre").notNull(),
-  referido: text("referido"),
-  telefono: text("telefono"),
-  email: text("email"),
-  /** Copied to each new settlement, e.g. an NGO or a school. */
-  sinComision: integer("sin_comision", { mode: "boolean" })
-    .notNull()
-    .default(false),
-});
+export const clientes = sqliteTable(
+  "clientes",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    /** Unique: renaming a client to another's name unifies them. */
+    nombre: text("nombre").notNull(),
+    referido: text("referido"),
+    telefono: text("telefono"),
+    email: text("email"),
+    /** Copied to each new settlement, e.g. an NGO or a school. */
+    sinComision: integer("sin_comision", { mode: "boolean" })
+      .notNull()
+      .default(false),
+  },
+  (t) => [uniqueIndex("clientes_nombre_idx").on(t.nombre)],
+);
 
 export const lotes = sqliteTable(
   "lotes",

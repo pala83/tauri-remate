@@ -7,15 +7,14 @@ import {
 import { Card } from "~/components/ui";
 import { anularPago } from "~/db/pagos";
 import { fechaCorta } from "~/lib/fechas";
-import { errorTxt, pesos } from "~/lib/textos";
-import { cuotasDe } from "./cuotas-de";
+import { errorTxt, pesos, plural } from "~/lib/textos";
 import { PagoFila } from "./pago-fila";
 
 export const PagosRegistrados = component$<{ estado: LiquidacionState }>(
   ({ estado }) => {
     const mensaje = useSignal<Mensaje>();
     const filas = useComputed$(() => {
-      const cuotas = cuotasDe(estado);
+      const cuotas = estado.cuotas.value;
       return (estado.liq.value?.pagos ?? []).map((pago) => {
         const lotes = (estado.datos.value?.pagoLotes ?? [])
           .filter((pl) => pl.pagoId === pago.id)
@@ -37,8 +36,7 @@ export const PagosRegistrados = component$<{ estado: LiquidacionState }>(
     const resumen = useComputed$(() => {
       const liq = estado.liq.value;
       if (!liq) return "";
-      const n =
-        liq.nPagos === 1 ? "1 pago válido" : `${liq.nPagos} pagos válidos`;
+      const n = plural(liq.nPagos, "pago válido", "pagos válidos");
       return `${n} · cobrado ${pesos(liq.cobros)}${liq.pagosAl ? ` · pagado ${pesos(liq.pagosAl)}` : ""}`;
     });
 

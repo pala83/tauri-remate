@@ -8,6 +8,10 @@ type Lote = LoteConClientes;
 /** A lot is sold or it isn't; one sold with another has that lot's buyer. */
 export const vendido = (lote: Lote) => lote.compradorId !== null;
 
+/** The lots sold together with N° `numero`, whose price is on it. */
+export const hijosDe = (lotes: Lote[], numero: number | null) =>
+  lotes.filter((l) => l.vendidoCon === numero);
+
 export const filtrarMartillo = (lotes: Lote[], filtro: FiltroMartillo) =>
   filtro === "todos"
     ? lotes
@@ -35,7 +39,7 @@ export const bloquesVendidos = (lotes: Lote[], porBloque = 100) => {
     bloques.push({
       desde,
       hasta,
-      rango: `${numeroLote(desde)} – ${numeroLote(hasta)}`,
+      rango: `${numeroLote(desde)} - ${numeroLote(hasta)}`,
       cuenta: `${suyos.filter(vendido).length}/${suyos.length}`,
     });
   }

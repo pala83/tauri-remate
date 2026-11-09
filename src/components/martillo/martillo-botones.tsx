@@ -36,7 +36,11 @@ export const MartilloBotones = component$<BotonesProps>(({ m, acciones }) => {
           mensaje={
             m.mensaje.value && {
               ...m.mensaje.value,
-              deshacer: m.deshacer.value?.numero,
+              // Only next to the message of the change it undoes, not a later error.
+              deshacer:
+                m.mensaje.value.tipo === "ok"
+                  ? m.deshacer.value?.numero
+                  : undefined,
             }
           }
           onDeshacer$={acciones.revertir}

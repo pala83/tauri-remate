@@ -1,14 +1,11 @@
-import { component$, useComputed$, useSignal } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import type { LiquidacionState } from "~/components/liquidacion/use-liquidacion";
-import {
-  FormMessage,
-  type Mensaje,
-} from "~/components/page-columns/form-message";
+import { FormMessage } from "~/components/page-columns/form-message";
 import { Button, Card } from "~/components/ui";
 import { fechaCorta } from "~/lib/fechas";
 import { pesos } from "~/lib/textos";
-import { cuotasDe } from "./cuotas-de";
 import { PlanForm } from "./plan-form";
+import { usePlanCuotas } from "./use-plan-cuotas";
 
 const CLASE_ESTADO = {
   pagada: "text-sidebar-accent",
@@ -19,9 +16,9 @@ const CLASE_ESTADO = {
 
 export const PlanCuotas = component$<{ estado: LiquidacionState }>(
   ({ estado }) => {
-    const abierto = useSignal(false);
-    const mensaje = useSignal<Mensaje>();
-    const cuotas = useComputed$(() => cuotasDe(estado));
+    const plan = usePlanCuotas(estado.liq.value?.liq?.id ?? 0);
+    const { abierto, mensaje } = plan;
+    const { cuotas } = estado;
 
     return (
       <Card.Root class="overflow-hidden shadow-lg" aria-label="Plan de cuotas">
@@ -40,9 +37,7 @@ export const PlanCuotas = component$<{ estado: LiquidacionState }>(
             </Button>
           )}
         </header>
-        {abierto.value && (
-          <PlanForm estado={estado} abierto={abierto} mensaje={mensaje} />
-        )}
+        {abierto.value && <PlanForm estado={estado} plan={plan} />}
         {cuotas.value.length > 0 && (
           <div class="overflow-x-auto">
             <table class="w-full min-w-165 border-collapse">

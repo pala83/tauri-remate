@@ -19,13 +19,13 @@ export const panelVariants = cva(
     variants: {
       position: {
         center:
-          "rounded-base m-auto max-w-lg shadow-lg data-closed:zoom-out-95 data-closed:fade-out data-closing:backdrop:fade-out data-open:zoom-in-95 data-open:fade-in data-open:slide-in-from-bottom-2 data-open:backdrop:fade-in",
-        top: "rounded-b-base inset-x-0 top-0 mb-auto w-full border-b data-closing:slide-out-to-top data-open:slide-in-from-top",
+          "rounded-sm m-auto max-w-lg shadow-lg data-closed:zoom-out-95 data-closed:fade-out data-closing:backdrop:fade-out data-open:zoom-in-95 data-open:fade-in data-open:slide-in-from-bottom-2 data-open:backdrop:fade-in",
+        top: "rounded-b-sm inset-x-0 top-0 mb-auto w-full border-b data-closing:slide-out-to-top data-open:slide-in-from-top",
         bottom:
-          "rounded-t-base inset-x-0 bottom-0 mt-auto w-full border-t data-closing:slide-out-to-bottom data-open:slide-in-from-bottom",
-        left: "rounded-r-base inset-y-0 left-0 mr-auto h-full max-w-sm border-r data-closing:slide-out-to-left data-open:slide-in-from-left",
+          "rounded-t-sm inset-x-0 bottom-0 mt-auto w-full border-t data-closing:slide-out-to-bottom data-open:slide-in-from-bottom",
+        left: "rounded-r-sm inset-y-0 left-0 mr-auto h-full max-w-sm border-r data-closing:slide-out-to-left data-open:slide-in-from-left",
         right:
-          "rounded-l-base inset-y-0 right-0 ml-auto h-full max-w-sm border-l data-closing:slide-out-to-right data-open:slide-in-from-right",
+          "rounded-l-sm inset-y-0 right-0 ml-auto h-full max-w-sm border-l data-closing:slide-out-to-right data-open:slide-in-from-right",
       },
     },
     defaultVariants: {

@@ -2,17 +2,16 @@ import { component$ } from "@builder.io/qwik";
 import { Field } from "~/components/page-columns/field";
 import { Segmentado } from "~/components/segmentado/segmentado";
 import { Input } from "~/components/ui";
+import { MEDIOS } from "./medios";
 import type { PagoFormState } from "./use-pago-form";
 
-const MEDIOS = [
-  { valor: "efectivo", texto: "Efectivo" },
-  { valor: "transferencia", texto: "Transferencia" },
-  { valor: "cheque", texto: "Cheque" },
-  { valor: "otro", texto: "Otro" },
-];
+const OPCIONES = Object.entries(MEDIOS).map(([valor, texto]) => ({
+  valor,
+  texto,
+}));
 
+/** Cash has no detail: its field isn't shown. */
 const ETIQUETAS = {
-  efectivo: "",
   transferencia: "Banco y N° de operación",
   cheque: "Banco y N° de cheque",
   otro: "Detalle",
@@ -26,7 +25,7 @@ export const PagoMedio = component$<{ form: PagoFormState }>(({ form }) => {
         <Segmentado
           etiqueta="Medio de pago"
           valor={form.medio}
-          opciones={MEDIOS}
+          opciones={OPCIONES}
           onElegir$={(valor) => {
             form.medio = valor as PagoFormState["medio"];
           }}

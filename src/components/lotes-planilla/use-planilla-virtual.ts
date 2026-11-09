@@ -82,7 +82,13 @@ export const usePlanillaVirtual = (filas: Signal<LoteConClientes[]>) => {
     cleanup(() => cancelAnimationFrame(frame));
   });
 
-  return { caja, inicio, rango, destino, onScroll };
+  /** Scrolls to N° `numero`, or the next one, in `filas`: the rows the sheet draws, by number. */
+  const mostrar = $((filas: { numero: number }[], numero: number) => {
+    const fila = filas.findIndex((l) => l.numero >= numero);
+    if (fila !== -1) destino.value = { fila };
+  });
+
+  return { caja, inicio, rango, destino, onScroll, mostrar };
 };
 
 export type PlanillaVirtual = ReturnType<typeof usePlanillaVirtual>;

@@ -1,11 +1,12 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "./client";
+import { olvidarPagos } from "./olvidos";
 import { cuotas, pagos, type NewCuota, type NewPago } from "./schema";
 
 /** A single INSERT: the plan is saved whole or not at all. */
 export async function guardarCuotas(filas: NewCuota[]) {
   const db = await getDb();
-  await db.insert(cuotas).values(filas);
+  await db.insert(cuotas).values(filas).finally(olvidarPagos);
 }
 
 export type LotePagado = {
@@ -26,10 +27,14 @@ export async function registrarPago(pago: NewPago, cubre: LotePagado[]) {
         : null,
     },
     lotes: cubre,
-  });
+  }).finally(olvidarPagos);
 }
 
 export async function anularPago(id: number) {
   const db = await getDb();
-  await db.update(pagos).set({ anulado: true }).where(eq(pagos.id, id));
+  await db
+    .update(pagos)
+    .set({ anulado: true })
+    .where(eq(pagos.id, id))
+    .finally(olvidarPagos);
 }

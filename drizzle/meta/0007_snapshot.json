@@ -1,0 +1,772 @@
+{
+  "id": "6cf01b11-5cd5-4711-8a5b-e525da00d143",
+  "prevId": "587583e2-ac3e-4794-a1dc-2ac6d0f70915",
+  "version": "6",
+  "dialect": "sqlite",
+  "tables": {
+    "clientes": {
+      "name": "clientes",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "referido": {
+          "name": "referido",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "telefono": {
+          "name": "telefono",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "sin_comision": {
+          "name": "sin_comision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        }
+      },
+      "indexes": {
+        "clientes_nombre_idx": {
+          "name": "clientes_nombre_idx",
+          "columns": [
+            "nombre"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "cuotas": {
+      "name": "cuotas",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "liquidacion_id": {
+          "name": "liquidacion_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "remate_id": {
+          "name": "remate_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "lote_numero": {
+          "name": "lote_numero",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "plazo_dias": {
+          "name": "plazo_dias",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "vence": {
+          "name": "vence",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "monto": {
+          "name": "monto",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "cuotas_liquidacion_idx": {
+          "name": "cuotas_liquidacion_idx",
+          "columns": [
+            "liquidacion_id"
+          ],
+          "isUnique": false
+        },
+        "cuotas_lote_idx": {
+          "name": "cuotas_lote_idx",
+          "columns": [
+            "remate_id",
+            "lote_numero"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "cuotas_liquidacion_id_liquidaciones_id_fk": {
+          "name": "cuotas_liquidacion_id_liquidaciones_id_fk",
+          "tableFrom": "cuotas",
+          "columnsFrom": [
+            "liquidacion_id"
+          ],
+          "tableTo": "liquidaciones",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "cuotas_remate_id_lote_numero_lotes_remate_id_numero_fk": {
+          "name": "cuotas_remate_id_lote_numero_lotes_remate_id_numero_fk",
+          "tableFrom": "cuotas",
+          "columnsFrom": [
+            "remate_id",
+            "lote_numero"
+          ],
+          "tableTo": "lotes",
+          "columnsTo": [
+            "remate_id",
+            "numero"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "cuotas_lote_check": {
+          "name": "cuotas_lote_check",
+          "value": "(\"cuotas\".\"remate_id\" IS NULL) = (\"cuotas\".\"lote_numero\" IS NULL)"
+        },
+        "cuotas_plazo_check": {
+          "name": "cuotas_plazo_check",
+          "value": "\"cuotas\".\"plazo_dias\" >= 0"
+        },
+        "cuotas_monto_check": {
+          "name": "cuotas_monto_check",
+          "value": "\"cuotas\".\"monto\" > 0"
+        }
+      }
+    },
+    "liquidaciones": {
+      "name": "liquidaciones",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "remate_id": {
+          "name": "remate_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cliente_id": {
+          "name": "cliente_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "sin_comision": {
+          "name": "sin_comision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "notas": {
+          "name": "notas",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "liquidaciones_remate_cliente_idx": {
+          "name": "liquidaciones_remate_cliente_idx",
+          "columns": [
+            "remate_id",
+            "cliente_id"
+          ],
+          "isUnique": true
+        },
+        "liquidaciones_cliente_idx": {
+          "name": "liquidaciones_cliente_idx",
+          "columns": [
+            "cliente_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "liquidaciones_remate_id_remates_id_fk": {
+          "name": "liquidaciones_remate_id_remates_id_fk",
+          "tableFrom": "liquidaciones",
+          "columnsFrom": [
+            "remate_id"
+          ],
+          "tableTo": "remates",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "liquidaciones_cliente_id_clientes_id_fk": {
+          "name": "liquidaciones_cliente_id_clientes_id_fk",
+          "tableFrom": "liquidaciones",
+          "columnsFrom": [
+            "cliente_id"
+          ],
+          "tableTo": "clientes",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "lotes": {
+      "name": "lotes",
+      "columns": {
+        "remate_id": {
+          "name": "remate_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "numero": {
+          "name": "numero",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "dueno_id": {
+          "name": "dueno_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "comprador_id": {
+          "name": "comprador_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cantidad": {
+          "name": "cantidad",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "materiales": {
+          "name": "materiales",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "marca": {
+          "name": "marca",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "funciona": {
+          "name": "funciona",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "es_nuevo": {
+          "name": "es_nuevo",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "precio_base": {
+          "name": "precio_base",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "imagen": {
+          "name": "imagen",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "precio_venta": {
+          "name": "precio_venta",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "vendido_con": {
+          "name": "vendido_con",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "comision_compra": {
+          "name": "comision_compra",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1000
+        },
+        "comision_venta": {
+          "name": "comision_venta",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1000
+        }
+      },
+      "indexes": {
+        "lotes_dueno_idx": {
+          "name": "lotes_dueno_idx",
+          "columns": [
+            "dueno_id"
+          ],
+          "isUnique": false
+        },
+        "lotes_comprador_idx": {
+          "name": "lotes_comprador_idx",
+          "columns": [
+            "comprador_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "lotes_remate_id_remates_id_fk": {
+          "name": "lotes_remate_id_remates_id_fk",
+          "tableFrom": "lotes",
+          "columnsFrom": [
+            "remate_id"
+          ],
+          "tableTo": "remates",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "lotes_dueno_id_clientes_id_fk": {
+          "name": "lotes_dueno_id_clientes_id_fk",
+          "tableFrom": "lotes",
+          "columnsFrom": [
+            "dueno_id"
+          ],
+          "tableTo": "clientes",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "lotes_comprador_id_clientes_id_fk": {
+          "name": "lotes_comprador_id_clientes_id_fk",
+          "tableFrom": "lotes",
+          "columnsFrom": [
+            "comprador_id"
+          ],
+          "tableTo": "clientes",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "lotes_remate_id_vendido_con_lotes_remate_id_numero_fk": {
+          "name": "lotes_remate_id_vendido_con_lotes_remate_id_numero_fk",
+          "tableFrom": "lotes",
+          "columnsFrom": [
+            "remate_id",
+            "vendido_con"
+          ],
+          "tableTo": "lotes",
+          "columnsTo": [
+            "remate_id",
+            "numero"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {
+        "lotes_remate_id_numero_pk": {
+          "columns": [
+            "remate_id",
+            "numero"
+          ],
+          "name": "lotes_remate_id_numero_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "lotes_numero_check": {
+          "name": "lotes_numero_check",
+          "value": "\"lotes\".\"numero\" >= 1"
+        },
+        "lotes_venta_check": {
+          "name": "lotes_venta_check",
+          "value": "(\"lotes\".\"comprador_id\" IS NULL) = (\"lotes\".\"precio_venta\" IS NULL AND \"lotes\".\"vendido_con\" IS NULL)"
+        },
+        "lotes_vendido_con_check": {
+          "name": "lotes_vendido_con_check",
+          "value": "\"lotes\".\"precio_venta\" IS NULL OR \"lotes\".\"vendido_con\" IS NULL"
+        },
+        "lotes_comision_compra_check": {
+          "name": "lotes_comision_compra_check",
+          "value": "\"lotes\".\"comision_compra\" BETWEEN 0 AND 10000"
+        },
+        "lotes_comision_venta_check": {
+          "name": "lotes_comision_venta_check",
+          "value": "\"lotes\".\"comision_venta\" BETWEEN 0 AND 10000"
+        }
+      }
+    },
+    "pago_lotes": {
+      "name": "pago_lotes",
+      "columns": {
+        "pago_id": {
+          "name": "pago_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "remate_id": {
+          "name": "remate_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "lote_numero": {
+          "name": "lote_numero",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "monto": {
+          "name": "monto",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "pago_lotes_lote_idx": {
+          "name": "pago_lotes_lote_idx",
+          "columns": [
+            "remate_id",
+            "lote_numero"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "pago_lotes_pago_id_pagos_id_fk": {
+          "name": "pago_lotes_pago_id_pagos_id_fk",
+          "tableFrom": "pago_lotes",
+          "columnsFrom": [
+            "pago_id"
+          ],
+          "tableTo": "pagos",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "pago_lotes_remate_id_lote_numero_lotes_remate_id_numero_fk": {
+          "name": "pago_lotes_remate_id_lote_numero_lotes_remate_id_numero_fk",
+          "tableFrom": "pago_lotes",
+          "columnsFrom": [
+            "remate_id",
+            "lote_numero"
+          ],
+          "tableTo": "lotes",
+          "columnsTo": [
+            "remate_id",
+            "numero"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {
+        "pago_lotes_pago_id_remate_id_lote_numero_pk": {
+          "columns": [
+            "pago_id",
+            "remate_id",
+            "lote_numero"
+          ],
+          "name": "pago_lotes_pago_id_remate_id_lote_numero_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "pago_lotes_monto_check": {
+          "name": "pago_lotes_monto_check",
+          "value": "\"pago_lotes\".\"monto\" > 0"
+        }
+      }
+    },
+    "pagos": {
+      "name": "pagos",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "liquidacion_id": {
+          "name": "liquidacion_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cuota_id": {
+          "name": "cuota_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "sentido": {
+          "name": "sentido",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fecha": {
+          "name": "fecha",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "monto": {
+          "name": "monto",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "medio": {
+          "name": "medio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "referencia": {
+          "name": "referencia",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "acredita": {
+          "name": "acredita",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "anulado": {
+          "name": "anulado",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        }
+      },
+      "indexes": {
+        "pagos_liquidacion_idx": {
+          "name": "pagos_liquidacion_idx",
+          "columns": [
+            "liquidacion_id"
+          ],
+          "isUnique": false
+        },
+        "pagos_cuota_idx": {
+          "name": "pagos_cuota_idx",
+          "columns": [
+            "cuota_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "pagos_liquidacion_id_liquidaciones_id_fk": {
+          "name": "pagos_liquidacion_id_liquidaciones_id_fk",
+          "tableFrom": "pagos",
+          "columnsFrom": [
+            "liquidacion_id"
+          ],
+          "tableTo": "liquidaciones",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "pagos_cuota_id_cuotas_id_fk": {
+          "name": "pagos_cuota_id_cuotas_id_fk",
+          "tableFrom": "pagos",
+          "columnsFrom": [
+            "cuota_id"
+          ],
+          "tableTo": "cuotas",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "pagos_monto_check": {
+          "name": "pagos_monto_check",
+          "value": "\"pagos\".\"monto\" > 0"
+        },
+        "pagos_sentido_check": {
+          "name": "pagos_sentido_check",
+          "value": "\"pagos\".\"sentido\" IN ('cobro', 'pago')"
+        },
+        "pagos_medio_check": {
+          "name": "pagos_medio_check",
+          "value": "\"pagos\".\"medio\" IN ('efectivo', 'transferencia', 'cheque', 'otro')"
+        }
+      }
+    },
+    "remates": {
+      "name": "remates",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fecha": {
+          "name": "fecha",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "lugar": {
+          "name": "lugar",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

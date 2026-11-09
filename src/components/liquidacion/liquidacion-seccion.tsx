@@ -16,13 +16,13 @@ import type { LiquidacionState } from "./use-liquidacion";
 type SeccionProps = {
   estado: LiquidacionState;
   cliente: Signal<ClienteResumen | undefined>;
-  clienteId: number;
-  nombre: string;
 };
 
 export const LiquidacionSeccion = component$<SeccionProps>(
-  ({ estado, cliente, clienteId, nombre }) => {
+  ({ estado, cliente }) => {
     const { liq, datos, remate } = estado;
+    const clienteId = cliente.value?.id ?? 0;
+    const nombre = cliente.value?.nombre ?? "";
 
     return (
       <>
@@ -84,7 +84,9 @@ export const LiquidacionSeccion = component$<SeccionProps>(
               </div>
               <LiquidacionAcciones estado={estado} cliente={cliente} />
             </Card.Root>
-            <LiquidacionImpresa estado={estado} nombre={nombre} />
+            {estado.impresa.value && (
+              <LiquidacionImpresa vigente={estado.impresa.value} />
+            )}
           </div>
         )}
       </>

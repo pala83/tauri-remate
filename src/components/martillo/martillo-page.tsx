@@ -41,7 +41,8 @@ export const MartilloPage = component$(() => {
     $((e: KeyboardEvent) => {
       if (!e.ctrlKey) return;
       if (e.code === "KeyP") return acciones.pasar();
-      if (e.code === "KeyJ") return acciones.agregarSiguiente();
+      // Held down it would add a lot per repeat.
+      if (e.code === "KeyJ" && !e.repeat) return acciones.agregarSiguiente();
       if (/^Digit[1-5]$/.test(e.code)) {
         const id = m.recientes.value[Number(e.code.slice(5)) - 1];
         if (id) m.compradorId.value = id;
@@ -50,7 +51,7 @@ export const MartilloPage = component$(() => {
   );
 
   return (
-    <PageColumns planilla desplazable>
+    <PageColumns planilla desplazable recordar="martillo">
       <div q:slot="nav">
         {activa.value && <MartilloNav m={m} titulo={activa.value.nombre} />}
       </div>

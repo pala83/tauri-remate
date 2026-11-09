@@ -40,10 +40,7 @@ export const MartilloNav = component$<{ m: MartilloState; titulo: string }>(
           <NavItem
             key={desde}
             current={visible.value >= desde && visible.value <= hasta}
-            onClick$={() => {
-              const fila = m.filas.value.findIndex((l) => l.numero >= desde);
-              if (fila !== -1) m.virtual.destino.value = { fila };
-            }}
+            onClick$={() => m.virtual.mostrar(m.filas.value, desde)}
           >
             <span class="flex-1 font-mono text-sm">{rango}</span>
             <span class="text-muted-foreground font-mono text-xs font-normal">

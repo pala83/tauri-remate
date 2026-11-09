@@ -235,14 +235,6 @@
   scrollbar-width: thin;
   scrollbar-color: var(--muted-foreground) transparent;
 }
-@utility border-width-* {
-  /* prettier-ignore */
-  border: --value(--border-width-*);
-}
-@utility stroke-width-* {
-  /* prettier-ignore */
-  stroke: --value(--stroke-width-*);
-}
 @utility shadow-* {
   /* prettier-ignore */
   box-shadow: --value(--shadow-*);

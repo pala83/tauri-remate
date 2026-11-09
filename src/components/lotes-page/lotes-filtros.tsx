@@ -1,15 +1,12 @@
 import { $, component$, useSignal } from "@builder.io/qwik";
 import { LuSearch } from "@qwikest/icons/lucide";
+import { GRUPO, OPCION } from "~/components/segmentado/clases";
 import { Input, Label, ToggleGroup } from "~/components/ui";
 import type { LotesPageState } from "./use-lotes-page";
-
-const ITEM =
-  "hover:bg-muted aria-pressed:hover:bg-foreground not-last:border-input gap-2 rounded-none border-0 font-mono not-last:border-r";
 
 export const LotesFiltros = component$<{ page: LotesPageState }>(({ page }) => {
   const numero = useSignal("");
   const error = useSignal("");
-  const resumen = page.resumen.value;
 
   const elegirFiltro = $((valor: string) => {
     // Pressing the active filter deselects it: back to all of them.
@@ -67,16 +64,16 @@ export const LotesFiltros = component$<{ page: LotesPageState }>(({ page }) => {
       <ToggleGroup.Root
         bind:value={page.filtro}
         onChange$={elegirFiltro}
-        class="bg-popover w-fit gap-0 overflow-hidden rounded-sm border shadow-xs"
+        class={GRUPO}
       >
-        <ToggleGroup.Item value="todos" size="lg" class={ITEM}>
-          Todos <span>{resumen.total}</span>
+        <ToggleGroup.Item value="todos" size="lg" class={OPCION}>
+          Todos <span>{page.resumen.value.total}</span>
         </ToggleGroup.Item>
-        <ToggleGroup.Item value="sin-detalles" size="lg" class={ITEM}>
-          Sin detalles <span>{resumen.sinDetalles}</span>
+        <ToggleGroup.Item value="sin-detalles" size="lg" class={OPCION}>
+          Sin detalles <span>{page.resumen.value.sinDetalles}</span>
         </ToggleGroup.Item>
-        <ToggleGroup.Item value="sin-foto" size="lg" class={ITEM}>
-          Sin foto <span>{resumen.sinFoto}</span>
+        <ToggleGroup.Item value="sin-foto" size="lg" class={OPCION}>
+          Sin foto <span>{page.resumen.value.sinFoto}</span>
         </ToggleGroup.Item>
       </ToggleGroup.Root>
     </div>

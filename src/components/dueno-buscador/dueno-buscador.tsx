@@ -1,29 +1,18 @@
-import { component$, type QRL } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import { LuCheck, LuPlus, LuSearch } from "@qwikest/icons/lucide";
 import { cn } from "@qwik-ui/utils";
 import { Combobox, Input } from "~/components/ui";
-import type { ClienteResumen } from "~/db/clientes";
+import { posicion, type DuenoBuscadorProps } from "./dueno-buscador-props";
 import { evitarPorDefecto, seleccionarTexto } from "./eventos-buscador";
 import { useDuenoBuscador } from "./use-dueno-buscador";
 
-export type DuenoBuscadorProps = {
-  id: string;
-  clientes: ClienteResumen[];
-  recientes: number[];
-  cuentas: Record<number, number>;
-  duenoId: number | null;
-  /** Floats the list above the field; otherwise a scrolling panel clips it. */
-  arriba?: boolean;
-  /** Floats the list below the field, over what comes after it. */
-  abajo?: boolean;
-  onElegir$: QRL<(id: number, conEnter: boolean) => void>;
-  onNuevo$: QRL<(nombre: string) => Promise<number>>;
-  onEnter$?: QRL<() => void>; // Enter with the list closed
-};
-
+/**
+ * The list is Qwik UI's combobox, which handles the mouse. The field is a plain
+ * Input because Combobox.Input adds its own key handlers to any we pass: Enter
+ * would choose twice, and it clears the highlight when typing.
+ */
 export const DuenoBuscador = component$<DuenoBuscadorProps>((props) => {
   const b = useDuenoBuscador(props);
-  const lista = b.lista.value;
   const listaId = `${props.id}-opciones`;
 
   return (
@@ -41,10 +30,10 @@ export const DuenoBuscador = component$<DuenoBuscadorProps>((props) => {
           role="combobox"
           autocomplete="off"
           aria-autocomplete="list"
-          aria-expanded={lista.length > 0}
+          aria-expanded={b.lista.value.length > 0}
           aria-controls={listaId}
           aria-activedescendant={
-            lista.length ? `${listaId}-${b.indice.value}` : ""
+            b.lista.value.length ? `${listaId}-${b.indice.value}` : ""
           }
           placeholder="Buscar cliente…"
           class="pr-10 pl-10.5"
@@ -60,21 +49,22 @@ export const DuenoBuscador = component$<DuenoBuscadorProps>((props) => {
           <LuCheck class="text-sidebar-accent pointer-events-none absolute right-3.5 size-4.5" />
         )}
       </Combobox.Control>
-      {lista.length > 0 && (
+      {b.error.value && (
+        <p role="alert" class="text-alert mt-1.5 text-sm">
+          No se pudo crear el cliente: {b.error.value}
+        </p>
+      )}
+      {b.lista.value.length > 0 && (
         <Combobox.Inline
           id={listaId}
           preventdefault:mousedown
           aria-label="Clientes"
           class={cn(
             "bg-card rounded-sm border p-1.5 shadow-xs",
-            props.arriba
-              ? "absolute inset-x-0 bottom-full z-30 mb-2 max-h-96 overflow-y-auto shadow-2xl"
-              : props.abajo
-                ? "absolute inset-x-0 top-full z-30 mt-2 max-h-96 overflow-y-auto shadow-2xl"
-                : "mt-2",
+            posicion(props),
           )}
         >
-          {lista.map((opcion, i) => (
+          {b.lista.value.map((opcion, i) => (
             <Combobox.Item
               key={opcion.clave}
               id={`${listaId}-${i}`}

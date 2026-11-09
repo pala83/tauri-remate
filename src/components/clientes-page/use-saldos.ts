@@ -1,7 +1,7 @@
 import { $, useComputed$, useSignal, type Signal } from "@builder.io/qwik";
 import { useAppState } from "~/components/app-state/app-state";
 import type { ClienteResumen } from "~/db/clientes";
-import { leerDatosRemate } from "~/db/liquidaciones";
+import { verDatosRemate } from "~/db/liquidaciones";
 import { liquidar, type DatosRemate } from "~/lib/liquidacion";
 
 /** Every client's balance in the active remate, for the list and its totals. */
@@ -32,7 +32,7 @@ export const useSaldos = (clientes: Signal<ClienteResumen[]>) => {
 
   const leerSaldos = $(async () => {
     const id = state.activoId;
-    datos.value = id === null ? undefined : await leerDatosRemate(id);
+    datos.value = id === null ? undefined : await verDatosRemate(id);
   });
 
   return { saldos, deuda, leerSaldos };

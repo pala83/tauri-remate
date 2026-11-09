@@ -9,7 +9,7 @@ export const SearchButton = component$(() => {
 
   const buscar = $(async () => {
     await navigate("/lotes/");
-    irA("lotes-cargados", "buscar-lote");
+    irA("planilla-caja", "buscar-lote");
   });
 
   return (

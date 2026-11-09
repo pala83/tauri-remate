@@ -16,7 +16,7 @@ export const PageToc = component$<TocProps>(({ items }) => {
           <li key={item.id}>
             <a
               href={`#${item.id}`}
-              aria-current={actual.value === item.id ? "true" : undefined}
+              aria-current={actual.value === item.id ? "true" : "false"}
               onClick$={() => {
                 actual.value = item.id;
                 if (item.foco) document.getElementById(item.foco)?.focus();

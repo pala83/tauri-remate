@@ -1,14 +1,13 @@
-import { $, component$, type Signal } from "@builder.io/qwik";
+import { component$, type Signal } from "@builder.io/qwik";
 import { LuPrinter } from "@qwikest/icons/lucide";
 import { Chip } from "~/components/chip/chip";
 import { Field } from "~/components/page-columns/field";
 import { FormMessage } from "~/components/page-columns/form-message";
 import { Button } from "~/components/ui";
 import type { ClienteResumen } from "~/db/clientes";
-import { imprimir } from "~/lib/imprimir";
-import { ID_IMPRESA } from "./liquidacion-impresa";
 import type { LiquidacionState } from "./use-liquidacion";
 import { useLiquidacionAcciones } from "./use-liquidacion-acciones";
+import { useNotas } from "./use-notas";
 
 type AccionesProps = {
   estado: LiquidacionState;
@@ -18,6 +17,7 @@ type AccionesProps = {
 export const LiquidacionAcciones = component$<AccionesProps>(
   ({ estado, cliente }) => {
     const acciones = useLiquidacionAcciones(estado, cliente);
+    const notas = useNotas(estado);
 
     return (
       <div class="bg-muted flex flex-col gap-4 border-t px-7 py-4">
@@ -33,7 +33,7 @@ export const LiquidacionAcciones = component$<AccionesProps>(
               <Button
                 look="outline"
                 class="gap-2 shadow-xs"
-                onClick$={$(() => imprimir(ID_IMPRESA))}
+                onClick$={acciones.imprimirLiquidacion}
               >
                 <LuPrinter class="size-4" />
                 Imprimir liquidación
@@ -57,10 +57,11 @@ export const LiquidacionAcciones = component$<AccionesProps>(
             <textarea
               key={estado.liq.value.liq.id}
               id="liq-notas"
+              disabled={notas.value === undefined}
               rows={2}
               class="bg-popover placeholder:text-muted-foreground min-h-19 resize-y rounded-sm border px-3 py-2.5 text-lg placeholder:italic focus:shadow-inner focus:outline-hidden"
               placeholder="Acuerdos con el cliente, observaciones…"
-              value={estado.liq.value.liq.notas ?? ""}
+              value={notas.value ?? ""}
               onChange$={(_, el) => acciones.guardarNotas(el.value.trim())}
             />
           </Field>

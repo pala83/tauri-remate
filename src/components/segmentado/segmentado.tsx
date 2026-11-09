@@ -1,5 +1,7 @@
 import { component$, type QRL } from "@builder.io/qwik";
+import { cn } from "@qwik-ui/utils";
 import { Button } from "~/components/ui";
+import { GRUPO, OPCION } from "./clases";
 
 type SegmentadoProps = {
   opciones: { valor: string; texto: string; cuenta?: number }[];
@@ -11,17 +13,16 @@ type SegmentadoProps = {
 /** One option out of a few, like the sheet's filters. */
 export const Segmentado = component$<SegmentadoProps>((props) => {
   return (
-    <div
-      role="group"
-      aria-label={props.etiqueta}
-      class="bg-popover flex w-fit flex-wrap overflow-hidden rounded-sm border shadow-xs"
-    >
+    <div role="group" aria-label={props.etiqueta} class={GRUPO}>
       {props.opciones.map(({ valor, texto, cuenta }) => (
         <Button
           key={valor}
           look="ghost"
           aria-pressed={props.valor === valor}
-          class="not-last:border-input hover:bg-muted aria-pressed:bg-foreground aria-pressed:text-background aria-pressed:hover:bg-foreground h-11 gap-2 rounded-none border-0 px-4 font-mono text-sm font-normal not-last:border-r aria-pressed:font-bold"
+          class={cn(
+            OPCION,
+            "aria-pressed:bg-foreground aria-pressed:text-background px-4 text-sm font-normal aria-pressed:font-bold",
+          )}
           onClick$={() => props.onElegir$(valor)}
         >
           {texto}
