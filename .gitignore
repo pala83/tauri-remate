@@ -46,6 +46,8 @@ lerna-debug.log*
 .nx/workspace-data
 # Symlink to the local app data dir (~/.config/com.palazzo.remates)
 /.playwright-mcp
+/.claude
+/.nx
 
 # Scripts delirantes que me saco de la manga para ver si logro hacer que esta cuestion se comporte como quiero
 /com.palazzo.remates

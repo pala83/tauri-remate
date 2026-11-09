@@ -45,7 +45,8 @@ Note that `bun build` (without `run`) invokes bun's own bundler, not the `build`
 - `tauri.conf.json`: dev loads the Vite server (`devUrl` 5173, `beforeDevCommand: bun dev`); production loads static files from `frontendDist: ../dist`.
 - `capabilities/default.json` grants the `main` window `core:default`, the SQL permissions and the image picker's (`dialog`, `fs` limited to `$APPCONFIG/imagenes`). Images are copied there by `src/db/imagenes.ts`, and the DB stores the path. `opener:allow-open-url` only allows the Google Maps sites that `src/lib/lugar.ts` accepts; keep both lists the same. Its patterns are globs compared to the literal URL, which is why `lugar` is saved as `new URL(...).href`. Any new plugin or command the frontend calls needs a permission added there.
 - `bun run build` runs `build.server` = `vite build -c adapters/static/vite.config.ts`, which prerenders every route into `dist/`. Inside Tauri there is no Node server, so `routeLoader$` / `server$` only run at prerender time; runtime work happens client-side (DB via the SQL plugin) or in Rust commands.
-- The `identifier` (`com.palazzo.remates`) determines the app config dir where the DB lives; changing it orphans existing data.
+- The `identifier` (`com.palazzo.remates`) determines the app config dir where the DB lives; changing it orphans existing data. `productName` («Libro de Remates») can change freely.
+- Releases: pushing a `v*` tag runs `.github/workflows/release.yml`, which runs the tests and then builds the `.deb` (ubuntu-22.04), the NSIS `.exe` and a universal `.dmg` into a draft Release ("Publicar una versión" in `README.md`). The version lives in `tauri.conf.json`, `Cargo.toml` and `package.json`; keep the three equal. Icons come from `app-icon.png` via `bunx tauri icon`; the generated `android/` and `ios/` folders aren't used. The app isn't signed: macOS gets an ad-hoc signature (`signingIdentity: "-"`).
 
 ## Database
 

@@ -1,7 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "remate",
-  "version": "0.1.0",
+  "productName": "Libro de Remates",
+  "mainBinaryName": "libro-de-remates",
+  "version": "1.0.0",
   "identifier": "com.palazzo.remates",
   "build": {
     "frontendDist": "../dist",
@@ -12,7 +13,7 @@
   "app": {
     "windows": [
       {
-        "title": "remates-palazzo",
+        "title": "Libro de Remates",
         "width": 1280,
         "height": 800,
         "maximized": true,
@@ -24,9 +25,7 @@
       "csp": null,
       "assetProtocol": {
         "enable": true,
-        "scope": [
-          "$APPCONFIG/imagenes/**"
-        ]
+        "scope": ["$APPCONFIG/imagenes/**"]
       }
     }
   },
@@ -42,6 +41,14 @@
     ],
     "android": {
       "debugApplicationIdSuffix": ".debug"
+    },
+    "publisher": "Ulises Palazzo",
+    "copyright": "© 2026 Ulises Palazzo",
+    "category": "Business",
+    "shortDescription": "Libro de remates: lotes, ventas, clientes y liquidaciones.",
+    "longDescription": "Lleva un remate de punta a punta: la carga de lotes, la venta lote por lote, los clientes y sus liquidaciones, cuotas y pagos. Los datos quedan en una base local del equipo.",
+    "macOS": {
+      "signingIdentity": "-"
     }
   }
 }

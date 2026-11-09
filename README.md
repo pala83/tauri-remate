@@ -8,6 +8,23 @@
 
 ---
 
+## Publicar una versión
+
+Los instaladores (Windows `.exe`, Linux `.deb`, Mac `.dmg`) los arma GitHub Actions (`.github/workflows/release.yml`), uno en cada sistema.
+
+1. Subí la versión, la misma en los tres archivos: `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml` y `package.json`.
+2. Hacé commit y subí el tag de esa versión:
+   ```shell
+   git tag v1.1.0
+   git push origin main v1.1.0
+   ```
+3. En la pestaña **Actions** de GitHub corre «Release»: primero los tests y después los tres instaladores, unos 15 minutos.
+4. En **Releases** queda un borrador con los tres archivos. Revisalo y tocá «Publish release».
+
+Si un instalador falla, corregí, borrá el tag (`git tag -d v1.1.0 && git push --delete origin v1.1.0`) y el borrador, y volvé a subirlo. El ícono sale de `app-icon.png`: para cambiarlo, reemplazá ese archivo y corré `bunx tauri icon`.
+
+---
+
 ## Project Structure
 
 This project is using Qwik with [QwikCity](https://qwik.dev/qwikcity/overview/). QwikCity is just an extra set of tools on top of Qwik to make it easier to build a full site, including directory-based routing, layouts, and more.
